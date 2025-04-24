@@ -28,6 +28,10 @@ export default {
                         presets: ['@babel/preset-env'] // Babel 프리셋
                     }
                 }
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'], // ✅ CSS 로더 추가
             }
         ]
     },
