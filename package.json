@@ -5,8 +5,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "start": "webpack serve --mode development --open",
     "build": "webpack --mode production",
-    "start": "webpack serve --mode development --open"
+    "dev": "npm run start",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "keywords": [
     "UDL",
@@ -14,13 +16,14 @@
     "WCAG",
     "axe-core"
   ],
-  "author": "너의 이름",
+  "author": "kenzie",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "babel-loader": "^9.2.1",
     "css-loader": "^7.1.2",
+    "gh-pages": "^6.3.0",
     "style-loader": "^4.0.0",
     "webpack": "^5.99.6",
     "webpack-cli": "^5.1.4",
@@ -28,10 +31,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kenziedev/UDL.git"
+    "url": "https://github.com/kenziedev/UDL.git"
   },
   "bugs": {
     "url": "https://github.com/kenziedev/UDL/issues"
   },
-  "homepage": "https://github.com/kenziedev/UDL#readme"
+  "homepage": "https://kenziedev.github.io/UDL/"
 }

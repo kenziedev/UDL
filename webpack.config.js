@@ -5,41 +5,64 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default {
-    mode: 'development', // 또는 'production'으로 변경 가능
-    entry: './src/main.js',
+    entry: {
+        main: './src/main.js',
+        udlAi: './src/udl-ai.js',
+    },
     output: {
-        filename: 'bundle.js',
+        filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
-        clean: true,           // 이전 번들 제거
-        module: true           // ES Module로 출력
+        publicPath: isProduction ? '/UDL/' : '/', // ⭐ 배포용은 /UDL/, 개발용은 /
+        clean: true,
+        module: true
     },
     experiments: {
-        outputModule: true      // ES Module 사용 허용
+        outputModule: true
     },
     module: {
         rules: [
             {
-                test: /\.js$/,        // .js 파일 모두
+                test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env'] // Babel 프리셋
+                        presets: ['@babel/preset-env']
                     }
                 }
             },
             {
                 test: /\.css$/i,
-                use: ['style-loader', 'css-loader'], // ✅ CSS 로더 추가
+                use: ['style-loader', 'css-loader']
             }
         ]
     },
-    devtool: 'source-map',     // 디버깅용 소스맵
+    devtool: 'source-map',
     devServer: {
-        static: './dist',        // 정적 파일 경로
-        port: 8080,              // 개발 서버 포트
-        open: true,              // 브라우저 자동 열기
-        hot: true                // HMR(핫 리로딩) 사용
-    }
+        static: {
+            directory: path.join(__dirname, 'dist'),
+            watch: true,
+        },
+        client: {
+            overlay: true,
+            progress: true,
+        },
+        port: 8080,
+        open: true,
+        hot: true,
+        compress: true,
+        historyApiFallback: true,
+        watchFiles: {
+            paths: ['src/**/*', 'dist/**/*'],
+            options: {
+                ignored: /node_modules/,
+                aggregateTimeout: 300,
+                poll: 1000,
+            }
+        }
+    },
+    mode: isProduction ? 'production' : 'development', // ⭐ mode 자동 설정
 };
