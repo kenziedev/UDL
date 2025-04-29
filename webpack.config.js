@@ -1,6 +1,7 @@
 // webpack.config.js
 import path from 'path';
 import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +18,9 @@ export default {
         path: path.resolve(__dirname, 'dist'),
         publicPath: isProduction ? '/UDL/' : '/', // ⭐ 배포용은 /UDL/, 개발용은 /
         clean: true,
-        module: true
+        library: {
+            type: 'module'
+        }
     },
     experiments: {
         outputModule: true
@@ -40,7 +43,34 @@ export default {
             }
         ]
     },
-    devtool: 'source-map',
+    optimization: {
+        minimize: isProduction,
+        splitChunks: {
+            chunks: 'all',
+            minSize: 20000,
+            minChunks: 1,
+            maxAsyncRequests: 30,
+            maxInitialRequests: 30,
+            cacheGroups: {
+                defaultVendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10,
+                    reuseExistingChunk: true,
+                },
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true,
+                },
+            },
+        },
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        })
+    ],
+    devtool: isProduction ? 'source-map' : 'eval-source-map',
     devServer: {
         static: {
             directory: path.join(__dirname, 'dist'),
