@@ -115,6 +115,39 @@ npm run deploy
 - 자동으로 빌드 후 gh-pages 브랜치에 배포됩니다
 - 배포 후 https://kenziedev.github.io/UDL/ 에서 확인할 수 있습니다
 
+#### 북마클릿 설치 방법
+
+##### 로컬 개발 환경에서 사용
+1. 브라우저의 북마크바 표시 (Chrome: Ctrl + Shift + B)
+2. 아래 코드를 새 북마크로 추가:
+```javascript
+javascript:(function(){
+    var script=document.createElement('script');
+    script.src='http://localhost:8080/main.bundle.js';
+    document.body.appendChild(script);
+})();
+```
+3. 북마크 이름을 "UDL 접근성 검사 (개발)" 등으로 설정
+
+##### GitHub Pages 배포 버전 사용
+1. 브라우저의 북마크바 표시
+2. 아래 코드를 새 북마크로 추가:
+```javascript
+javascript:(function(){
+    var script=document.createElement('script');
+    script.src='https://kenziedev.github.io/UDL/main.bundle.js';
+    document.body.appendChild(script);
+})();
+```
+3. 북마크 이름을 "UDL 접근성 검사" 등으로 설정
+
+#### 북마클릿 사용 방법
+1. 분석하고자 하는 웹페이지 방문
+2. 북마크바에서 설치한 "UDL 접근성 검사" 클릭
+3. 자동으로 분석 도구가 실행됨
+
+> **주의사항**: 일부 웹사이트에서는 보안 정책(CSP)으로 인해 북마클릿이 실행되지 않을 수 있습니다.
+
 ### 주의사항
 - 개발 모드에서는 환경 변수 `NODE_ENV`가 'development'로 설정됩니다
 - 프로덕션 빌드 시에는 환경 변수 `NODE_ENV`가 'production'으로 설정됩니다
