@@ -1,4 +1,6 @@
-# UDL (Universal Design for Learning) 웹 접근성 도구
+# <웹 접근성 및 UDL 자동 점검 및 분석> Tool
+
+> Universal Design for Learning(UDL) 원칙과 웹 접근성 지침을 기반으로 한 자동 분석 도구
 
 ## 주요 기능
 
