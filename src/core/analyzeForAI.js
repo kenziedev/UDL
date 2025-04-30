@@ -1,19 +1,25 @@
 // src/core/analyzeForAI.js
 
+// API 엔드포인트 설정 - Google의 Gemini AI 모델 사용
 const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
 
+// 메인 분석 함수: 웹페이지 분석을 시작하고 UI를 관리
 export function analyzeForAI() {
+    // UDL 탭 컨텐츠 영역 선택 및 로딩 표시
     const udlContent = document.getElementById('tab-content-udl');
     udlContent.innerHTML = '<div class="loading">AI 분석 중...</div>';
 
+    // 현재 페이지 데이터 수집
     const pageData = {
-        html: document.documentElement.outerHTML,
-        title: document.title || 'Untitled',
-        bodyText: document.body.innerText.slice(0, 3000)
+        html: document.documentElement.outerHTML,    // 전체 HTML
+        title: document.title || 'Untitled',         // 페이지 제목
+        bodyText: document.body.innerText.slice(0, 3000) // 본문 텍스트 (3000자 제한)
     };
 
+    // API 키 확인
     const userApiKey = sessionStorage.getItem('udl_api_key');
     if (!userApiKey) {
+        // API 키가 없을 경우 에러 메시지 표시
         udlContent.innerHTML = `
       <div class="error">
         <p>API KEY가 없습니다. 새로 고침하고 다시 시도해주세요.</p>
@@ -22,8 +28,10 @@ export function analyzeForAI() {
         return;
     }
 
+    // AI 분석 요청 및 결과 처리
     requestAIAnalysis(pageData, userApiKey)
         .then(response => {
+            // 성공 시 결과 표시
             udlContent.innerHTML = '';
             const result = document.createElement('div');
             result.className = 'ai-analysis-result';
@@ -31,6 +39,7 @@ export function analyzeForAI() {
             udlContent.appendChild(result);
         })
         .catch(error => {
+            // 에러 발생 시 에러 메시지 표시
             udlContent.innerHTML = `
         <div class="error">
           <p>AI 분석 실패: ${error.message}</p>
@@ -41,19 +50,20 @@ export function analyzeForAI() {
         });
 }
 
+// AI 분석 요청 함수: Gemini API와 통신
 async function requestAIAnalysis({ html, title, bodyText }, apiKey) {
+    // 페이지 내용 요약 생성
     const contentSummary = `
 페이지 제목: ${title}
 본문 요약:
 ${bodyText.slice(0, 1000)}...
-    `.trim(); // bodyText는 1000자 정도로 제한해 안정성 확보
+    `.trim();
 
+    // API 요청 본문 구성
     const requestBody = {
-        contents: [
-            {
-                parts: [
-                    {
-                        text: `
+        contents: [{
+            parts: [{
+                text: `
 너는 웹 접근성과 UDL(보편적 학습 설계) 전문가야.
 
 아래 페이지 정보를 분석해서:
@@ -76,19 +86,19 @@ ${bodyText.slice(0, 1000)}...
 ---
 ${contentSummary}
 ---
-                        `.trim()
-                    }
-                ]
-            }
-        ]
+                `.trim()
+            }]
+        }]
     };
 
+    // API 요청 실행
     const res = await fetch(`${API_ENDPOINT}?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
     });
 
+    // 응답 처리
     if (!res.ok) {
         throw new Error(`HTTP 오류 발생: ${res.status}`);
     }
@@ -103,32 +113,34 @@ ${contentSummary}
     return aiText;
 }
 
+// AI 응답을 HTML로 변환하는 함수
 export function formatAIResponse(text) {
     if (!text) return '';
 
-    // 기본 마크다운 변환
+    // 마크다운을 HTML로 변환
     let formatted = text
+        // 제목 변환
         .replace(/^### (.*)$/gm, '<h3>$1</h3>')
         .replace(/^## (.*)$/gm, '<h2>$1</h2>')
         .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+        // 코드 블록 변환
         .replace(/```([\s\S]*?)```/g, (_, code) => {
             return `<pre><code>${code.trim()}</code></pre>`;
         })
+        // 인라인 코드, 강조, 링크 등 변환
         .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 
-    // 리스트 항목 변환
+    // 리스트 처리
     formatted = formatted.replace(/^\s*[-*] (.*)$/gm, '<li>$1</li>');
-
-    // 리스트가 있다면 <ul>로 감싸기
     if (/<li>/.test(formatted)) {
         formatted = formatted.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-        formatted = formatted.replace(/<\/ul>\s*<ul>/g, ''); // 중복된 <ul> 제거
+        formatted = formatted.replace(/<\/ul>\s*<ul>/g, '');
     }
 
-    // 문단 처리 (빈 줄 기준)
+    // 문단 처리
     formatted = formatted.replace(/\n{2,}/g, '</p><p>');
     formatted = `<p>${formatted}</p>`;
 
@@ -139,22 +151,22 @@ export function formatAIResponse(text) {
   `;
 }
 
-
+// HTML 정리 함수: 불필요한 태그와 중복 제거
 export function cleanAIHtml(html) {
     if (!html) return '';
 
     return html
-        // 빈 <p></p> 삭제
+        // 빈 문단 제거
         .replace(/<p>\s*<\/p>/g, '')
-        // <h1><p> 이런 이상한 구조 정리
+        // 중첩된 태그 정리
         .replace(/<h(\d)><p>(.*?)<\/p><\/h\1>/g, '<h$1>$2</h$1>')
-        // <pre> 안에 <p> 같은 거 들어가있으면 정리
+        // pre 태그 내부 정리
         .replace(/<pre><p>(.*?)<\/p><\/pre>/gs, '<pre><code>$1</code></pre>')
-        // 코드를 조금 더 이쁘게
+        // 코드 블록 공백 정리
         .replace(/<pre><code>\s*/g, '<pre><code>')
         .replace(/\s*<\/code><\/pre>/g, '</code></pre>')
-        // 이상한 닫히지 않은 태그 제거 (아주 가볍게)
-        .replace(/<\/h\d>\s*<\/p>/g, '</h$1>') // 닫힌 h 태그 다음 p 제거
+        // 잘못된 태그 구조 수정
+        .replace(/<\/h\d>\s*<\/p>/g, '</h$1>')
         .trim();
 }
 
