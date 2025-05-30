@@ -11,168 +11,20 @@
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 506:
-/***/ ((__unused_webpack___webpack_module__, __unused_webpack___webpack_exports__, __webpack_require__) => {
+/***/ (() => {
 
-eval("/* harmony import */ var _styles_panel_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(719);\n/* harmony import */ var _styles_ai_analysis_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(908);\n/* harmony import */ var _styles_contrast_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(439);\n// 🧪 경량화된 모든 CSS 테스트\n // ✅ 경량화됨 (695줄 → 140줄)\n // ✅ 전역 리셋 제거됨\n // ✅ 경량화됨 (664줄 → 180줄)\n\nconsole.log('🚀 UDL 스크립트 로드됨 (모든 CSS 경량화)');\n\n// 🚀 간단한 실행 함수\nfunction initUDLTool() {\n  console.log('🔥 UDL 실행! (모든 CSS 경량화)');\n\n  // 기존 패널 제거\n  var existing = document.getElementById('udl-test-panel');\n  if (existing) existing.remove();\n\n  // 간단한 패널 생성\n  var panel = document.createElement('div');\n  panel.id = 'udl-test-panel';\n  panel.style.cssText = \"\\n        position: fixed; top: 20px; right: 20px; width: 350px; height: 180px;\\n        background: #28a745; color: white; padding: 20px; border-radius: 10px;\\n        z-index: 999999; font-family: Arial, sans-serif;\\n    \";\n  panel.innerHTML = \"\\n        <h3>\\uD83C\\uDF89 \\uC804\\uCCB4 CSS \\uACBD\\uB7C9\\uD654 \\uC131\\uACF5!</h3>\\n        <p><strong>\\u2705 panel.css:</strong> 695\\uC904 \\u2192 140\\uC904</p>\\n        <p><strong>\\u2705 ai-analysis.css:</strong> \\uC804\\uC5ED \\uB9AC\\uC14B \\uC81C\\uAC70</p>\\n        <p><strong>\\u2705 contrast.css:</strong> 664\\uC904 \\u2192 180\\uC904</p>\\n        <button onclick=\\\"this.parentElement.remove()\\\" style=\\\"\\n            background: white; color: #28a745; border: none;\\n            padding: 5px 10px; border-radius: 5px; cursor: pointer;\\n            margin-top: 10px;\\n        \\\">\\uB2EB\\uAE30</button>\\n    \";\n  document.body.appendChild(panel);\n  alert('🎉 모든 CSS 경량화 완료! UDL 도구가 실행되었습니다!');\n}\n\n// 전역 등록\nwindow.initUDLTool = initUDLTool;\nwindow.UDL = {\n  init: initUDLTool\n};\n\n// 즉시 실행\ninitUDLTool();//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNTA2LmpzIiwibWFwcGluZ3MiOiI7OztBQUFBO0FBQzRCLENBQVc7QUFDTCxDQUFLO0FBQ1IsQ0FBTzs7QUFFdENBLE9BQU8sQ0FBQ0MsR0FBRyxDQUFDLDhCQUE4QixDQUFDOztBQUUzQztBQUNBLFNBQVNDLFdBQVdBLENBQUEsRUFBRztFQUNuQkYsT0FBTyxDQUFDQyxHQUFHLENBQUMseUJBQXlCLENBQUM7O0VBRXRDO0VBQ0EsSUFBTUUsUUFBUSxHQUFHQyxRQUFRLENBQUNDLGNBQWMsQ0FBQyxnQkFBZ0IsQ0FBQztFQUMxRCxJQUFJRixRQUFRLEVBQUVBLFFBQVEsQ0FBQ0csTUFBTSxDQUFDLENBQUM7O0VBRS9CO0VBQ0EsSUFBTUMsS0FBSyxHQUFHSCxRQUFRLENBQUNJLGFBQWEsQ0FBQyxLQUFLLENBQUM7RUFDM0NELEtBQUssQ0FBQ0UsRUFBRSxHQUFHLGdCQUFnQjtFQUMzQkYsS0FBSyxDQUFDRyxLQUFLLENBQUNDLE9BQU8sb09BSWxCO0VBQ0RKLEtBQUssQ0FBQ0ssU0FBUyxpbUJBVWQ7RUFFRFIsUUFBUSxDQUFDUyxJQUFJLENBQUNDLFdBQVcsQ0FBQ1AsS0FBSyxDQUFDO0VBQ2hDUSxLQUFLLENBQUMsb0NBQW9DLENBQUM7QUFDL0M7O0FBRUE7QUFDQUMsTUFBTSxDQUFDZCxXQUFXLEdBQUdBLFdBQVc7QUFDaENjLE1BQU0sQ0FBQ0MsR0FBRyxHQUFHO0VBQUVDLElBQUksRUFBRWhCO0FBQVksQ0FBQzs7QUFFbEM7QUFDQUEsV0FBVyxDQUFDLENBQUMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly91ZGwvLi9zcmMvbWFpbi5qcz81NmQ3Il0sInNvdXJjZXNDb250ZW50IjpbIi8vIPCfp6og6rK965+J7ZmU65CcIOuqqOuToCBDU1Mg7YWM7Iqk7Yq4XHJcbmltcG9ydCAnLi9zdHlsZXMvcGFuZWwuY3NzJzsgICAgICAgICAgIC8vIOKchSDqsr3rn4ntmZTrkKggKDY5NeykhCDihpIgMTQw7KSEKVxyXG5pbXBvcnQgJy4vc3R5bGVzL2FpLWFuYWx5c2lzLmNzcyc7ICAgICAvLyDinIUg7KCE7JetIOumrOyFiyDsoJzqsbDrkKhcclxuaW1wb3J0ICcuL3N0eWxlcy9jb250cmFzdC5jc3MnOyAgICAgICAvLyDinIUg6rK965+J7ZmU65CoICg2NjTspIQg4oaSIDE4MOykhClcclxuXHJcbmNvbnNvbGUubG9nKCfwn5qAIFVETCDsiqTtgazrpr3tirgg66Gc65Oc65CoICjrqqjrk6AgQ1NTIOqyveufie2ZlCknKTtcclxuXHJcbi8vIPCfmoAg6rCE64uo7ZWcIOyLpO2WiSDtlajsiJhcclxuZnVuY3Rpb24gaW5pdFVETFRvb2woKSB7XHJcbiAgICBjb25zb2xlLmxvZygn8J+UpSBVREwg7Iuk7ZaJISAo66qo65OgIENTUyDqsr3rn4ntmZQpJyk7XHJcbiAgICBcclxuICAgIC8vIOq4sOyhtCDtjKjrhJAg7KCc6rGwXHJcbiAgICBjb25zdCBleGlzdGluZyA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd1ZGwtdGVzdC1wYW5lbCcpO1xyXG4gICAgaWYgKGV4aXN0aW5nKSBleGlzdGluZy5yZW1vdmUoKTtcclxuXHJcbiAgICAvLyDqsITri6jtlZwg7Yyo64SQIOyDneyEsVxyXG4gICAgY29uc3QgcGFuZWwgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdkaXYnKTtcclxuICAgIHBhbmVsLmlkID0gJ3VkbC10ZXN0LXBhbmVsJztcclxuICAgIHBhbmVsLnN0eWxlLmNzc1RleHQgPSBgXHJcbiAgICAgICAgcG9zaXRpb246IGZpeGVkOyB0b3A6IDIwcHg7IHJpZ2h0OiAyMHB4OyB3aWR0aDogMzUwcHg7IGhlaWdodDogMTgwcHg7XHJcbiAgICAgICAgYmFja2dyb3VuZDogIzI4YTc0NTsgY29sb3I6IHdoaXRlOyBwYWRkaW5nOiAyMHB4OyBib3JkZXItcmFkaXVzOiAxMHB4O1xyXG4gICAgICAgIHotaW5kZXg6IDk5OTk5OTsgZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmO1xyXG4gICAgYDtcclxuICAgIHBhbmVsLmlubmVySFRNTCA9IGBcclxuICAgICAgICA8aDM+8J+OiSDsoITssrQgQ1NTIOqyveufie2ZlCDshLHqs7UhPC9oMz5cclxuICAgICAgICA8cD48c3Ryb25nPuKchSBwYW5lbC5jc3M6PC9zdHJvbmc+IDY5NeykhCDihpIgMTQw7KSEPC9wPlxyXG4gICAgICAgIDxwPjxzdHJvbmc+4pyFIGFpLWFuYWx5c2lzLmNzczo8L3N0cm9uZz4g7KCE7JetIOumrOyFiyDsoJzqsbA8L3A+XHJcbiAgICAgICAgPHA+PHN0cm9uZz7inIUgY29udHJhc3QuY3NzOjwvc3Ryb25nPiA2NjTspIQg4oaSIDE4MOykhDwvcD5cclxuICAgICAgICA8YnV0dG9uIG9uY2xpY2s9XCJ0aGlzLnBhcmVudEVsZW1lbnQucmVtb3ZlKClcIiBzdHlsZT1cIlxyXG4gICAgICAgICAgICBiYWNrZ3JvdW5kOiB3aGl0ZTsgY29sb3I6ICMyOGE3NDU7IGJvcmRlcjogbm9uZTtcclxuICAgICAgICAgICAgcGFkZGluZzogNXB4IDEwcHg7IGJvcmRlci1yYWRpdXM6IDVweDsgY3Vyc29yOiBwb2ludGVyO1xyXG4gICAgICAgICAgICBtYXJnaW4tdG9wOiAxMHB4O1xyXG4gICAgICAgIFwiPuuLq+q4sDwvYnV0dG9uPlxyXG4gICAgYDtcclxuICAgIFxyXG4gICAgZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChwYW5lbCk7XHJcbiAgICBhbGVydCgn8J+OiSDrqqjrk6AgQ1NTIOqyveufie2ZlCDsmYTro4whIFVETCDrj4TqtazqsIAg7Iuk7ZaJ65CY7JeI7Iq164uI64ukIScpO1xyXG59XHJcblxyXG4vLyDsoITsl60g65Ox66GdXHJcbndpbmRvdy5pbml0VURMVG9vbCA9IGluaXRVRExUb29sO1xyXG53aW5kb3cuVURMID0geyBpbml0OiBpbml0VURMVG9vbCB9O1xyXG5cclxuLy8g7KaJ7IucIOyLpO2WiVxyXG5pbml0VURMVG9vbCgpO1xyXG4iXSwibmFtZXMiOlsiY29uc29sZSIsImxvZyIsImluaXRVRExUb29sIiwiZXhpc3RpbmciLCJkb2N1bWVudCIsImdldEVsZW1lbnRCeUlkIiwicmVtb3ZlIiwicGFuZWwiLCJjcmVhdGVFbGVtZW50IiwiaWQiLCJzdHlsZSIsImNzc1RleHQiLCJpbm5lckhUTUwiLCJib2R5IiwiYXBwZW5kQ2hpbGQiLCJhbGVydCIsIndpbmRvdyIsIlVETCIsImluaXQiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///506\n");
+eval("// 🧪 CSS와 모듈 완전 제거 테스트 - 순수 JavaScript만\n\nconsole.log('🚀 UDL 스크립트 로드됨 (CSS/모듈 완전 제거)');\n\n// 🚀 간단한 실행 함수\nfunction initUDLTool() {\n  console.log('🔥 UDL 실행! (CSS/모듈 완전 제거)');\n\n  // 기존 패널 제거\n  var existing = document.getElementById('udl-test-panel');\n  if (existing) existing.remove();\n\n  // 간단한 패널 생성\n  var panel = document.createElement('div');\n  panel.id = 'udl-test-panel';\n  panel.style.cssText = \"\\n        position: fixed; top: 20px; right: 20px; width: 300px; height: 150px;\\n        background: #dc3545; color: white; padding: 20px; border-radius: 10px;\\n        z-index: 999999; font-family: Arial, sans-serif; border: 2px solid white;\\n    \";\n  panel.innerHTML = \"\\n        <h3>\\uD83D\\uDD0D \\uC9C4\\uB2E8 \\uC911...</h3>\\n        <p>CSS\\uC640 \\uBAA8\\uB4C8\\uC744 \\uC644\\uC804\\uD788 \\uC81C\\uAC70\\uD55C \\uC0C1\\uD0DC\\uC785\\uB2C8\\uB2E4.</p>\\n        <p><strong>\\uC774\\uAC83\\uC774 \\uB728\\uBA74:</strong> JavaScript \\uBAA8\\uB4C8\\uC774 \\uBB38\\uC81C\\uC600\\uC74C</p>\\n        <button onclick=\\\"this.parentElement.remove()\\\" style=\\\"\\n            background: white; color: #dc3545; border: none;\\n            padding: 5px 10px; border-radius: 5px; cursor: pointer;\\n            margin-top: 10px;\\n        \\\">\\uB2EB\\uAE30</button>\\n    \";\n  document.body.appendChild(panel);\n  alert('🔍 순수 JavaScript 테스트: CSS와 모듈 완전 제거!');\n}\n\n// 전역 등록\nwindow.initUDLTool = initUDLTool;\nwindow.UDL = {\n  init: initUDLTool\n};\n\n// 즉시 실행\ninitUDLTool();//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNTA2LmpzIiwibmFtZXMiOlsiY29uc29sZSIsImxvZyIsImluaXRVRExUb29sIiwiZXhpc3RpbmciLCJkb2N1bWVudCIsImdldEVsZW1lbnRCeUlkIiwicmVtb3ZlIiwicGFuZWwiLCJjcmVhdGVFbGVtZW50IiwiaWQiLCJzdHlsZSIsImNzc1RleHQiLCJpbm5lckhUTUwiLCJib2R5IiwiYXBwZW5kQ2hpbGQiLCJhbGVydCIsIndpbmRvdyIsIlVETCIsImluaXQiXSwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsid2VicGFjazovL3VkbC8uL3NyYy9tYWluLmpzPzU2ZDciXSwic291cmNlc0NvbnRlbnQiOlsiLy8g8J+nqiBDU1PsmYAg66qo65OIIOyZhOyghCDsoJzqsbAg7YWM7Iqk7Yq4IC0g7Iic7IiYIEphdmFTY3JpcHTrp4xcclxuXHJcbmNvbnNvbGUubG9nKCfwn5qAIFVETCDsiqTtgazrpr3tirgg66Gc65Oc65CoIChDU1Mv66qo65OIIOyZhOyghCDsoJzqsbApJyk7XHJcblxyXG4vLyDwn5qAIOqwhOuLqO2VnCDsi6Ttlokg7ZWo7IiYXHJcbmZ1bmN0aW9uIGluaXRVRExUb29sKCkge1xyXG4gICAgY29uc29sZS5sb2coJ/CflKUgVURMIOyLpO2WiSEgKENTUy/rqqjrk4gg7JmE7KCEIOygnOqxsCknKTtcclxuICAgIFxyXG4gICAgLy8g6riw7KG0IO2MqOuEkCDsoJzqsbBcclxuICAgIGNvbnN0IGV4aXN0aW5nID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3VkbC10ZXN0LXBhbmVsJyk7XHJcbiAgICBpZiAoZXhpc3RpbmcpIGV4aXN0aW5nLnJlbW92ZSgpO1xyXG5cclxuICAgIC8vIOqwhOuLqO2VnCDtjKjrhJAg7IOd7ISxXHJcbiAgICBjb25zdCBwYW5lbCA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO1xyXG4gICAgcGFuZWwuaWQgPSAndWRsLXRlc3QtcGFuZWwnO1xyXG4gICAgcGFuZWwuc3R5bGUuY3NzVGV4dCA9IGBcclxuICAgICAgICBwb3NpdGlvbjogZml4ZWQ7IHRvcDogMjBweDsgcmlnaHQ6IDIwcHg7IHdpZHRoOiAzMDBweDsgaGVpZ2h0OiAxNTBweDtcclxuICAgICAgICBiYWNrZ3JvdW5kOiAjZGMzNTQ1OyBjb2xvcjogd2hpdGU7IHBhZGRpbmc6IDIwcHg7IGJvcmRlci1yYWRpdXM6IDEwcHg7XHJcbiAgICAgICAgei1pbmRleDogOTk5OTk5OyBmb250LWZhbWlseTogQXJpYWwsIHNhbnMtc2VyaWY7IGJvcmRlcjogMnB4IHNvbGlkIHdoaXRlO1xyXG4gICAgYDtcclxuICAgIHBhbmVsLmlubmVySFRNTCA9IGBcclxuICAgICAgICA8aDM+8J+UjSDsp4Tri6gg7KSRLi4uPC9oMz5cclxuICAgICAgICA8cD5DU1PsmYAg66qo65OI7J2EIOyZhOyghO2eiCDsoJzqsbDtlZwg7IOB7YOc7J6F64uI64ukLjwvcD5cclxuICAgICAgICA8cD48c3Ryb25nPuydtOqyg+ydtCDrnKjrqbQ6PC9zdHJvbmc+IEphdmFTY3JpcHQg66qo65OI7J20IOusuOygnOyYgOydjDwvcD5cclxuICAgICAgICA8YnV0dG9uIG9uY2xpY2s9XCJ0aGlzLnBhcmVudEVsZW1lbnQucmVtb3ZlKClcIiBzdHlsZT1cIlxyXG4gICAgICAgICAgICBiYWNrZ3JvdW5kOiB3aGl0ZTsgY29sb3I6ICNkYzM1NDU7IGJvcmRlcjogbm9uZTtcclxuICAgICAgICAgICAgcGFkZGluZzogNXB4IDEwcHg7IGJvcmRlci1yYWRpdXM6IDVweDsgY3Vyc29yOiBwb2ludGVyO1xyXG4gICAgICAgICAgICBtYXJnaW4tdG9wOiAxMHB4O1xyXG4gICAgICAgIFwiPuuLq+q4sDwvYnV0dG9uPlxyXG4gICAgYDtcclxuICAgIFxyXG4gICAgZG9jdW1lbnQuYm9keS5hcHBlbmRDaGlsZChwYW5lbCk7XHJcbiAgICBhbGVydCgn8J+UjSDsiJzsiJggSmF2YVNjcmlwdCDthYzsiqTtirg6IENTU+yZgCDrqqjrk4gg7JmE7KCEIOygnOqxsCEnKTtcclxufVxyXG5cclxuLy8g7KCE7JetIOuTseuhnVxyXG53aW5kb3cuaW5pdFVETFRvb2wgPSBpbml0VURMVG9vbDtcclxud2luZG93LlVETCA9IHsgaW5pdDogaW5pdFVETFRvb2wgfTtcclxuXHJcbi8vIOymieyLnCDsi6TtlolcclxuaW5pdFVETFRvb2woKTtcclxuIl0sIm1hcHBpbmdzIjoiQUFBQTs7QUFFQUEsT0FBTyxDQUFDQyxHQUFHLENBQUMsZ0NBQWdDLENBQUM7O0FBRTdDO0FBQ0EsU0FBU0MsV0FBV0EsQ0FBQSxFQUFHO0VBQ25CRixPQUFPLENBQUNDLEdBQUcsQ0FBQywyQkFBMkIsQ0FBQzs7RUFFeEM7RUFDQSxJQUFNRSxRQUFRLEdBQUdDLFFBQVEsQ0FBQ0MsY0FBYyxDQUFDLGdCQUFnQixDQUFDO0VBQzFELElBQUlGLFFBQVEsRUFBRUEsUUFBUSxDQUFDRyxNQUFNLENBQUMsQ0FBQzs7RUFFL0I7RUFDQSxJQUFNQyxLQUFLLEdBQUdILFFBQVEsQ0FBQ0ksYUFBYSxDQUFDLEtBQUssQ0FBQztFQUMzQ0QsS0FBSyxDQUFDRSxFQUFFLEdBQUcsZ0JBQWdCO0VBQzNCRixLQUFLLENBQUNHLEtBQUssQ0FBQ0MsT0FBTyw2UEFJbEI7RUFDREosS0FBSyxDQUFDSyxTQUFTLG1qQkFTZDtFQUVEUixRQUFRLENBQUNTLElBQUksQ0FBQ0MsV0FBVyxDQUFDUCxLQUFLLENBQUM7RUFDaENRLEtBQUssQ0FBQyxzQ0FBc0MsQ0FBQztBQUNqRDs7QUFFQTtBQUNBQyxNQUFNLENBQUNkLFdBQVcsR0FBR0EsV0FBVztBQUNoQ2MsTUFBTSxDQUFDQyxHQUFHLEdBQUc7RUFBRUMsSUFBSSxFQUFFaEI7QUFBWSxDQUFDOztBQUVsQztBQUNBQSxXQUFXLENBQUMsQ0FBQyIsImlnbm9yZUxpc3QiOltdfQ==\n//# sourceURL=webpack-internal:///506\n");
 
 /***/ })
 
 /******/ 	});
 /************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/chunk loaded */
-/******/ 	(() => {
-/******/ 		var deferred = [];
-/******/ 		__webpack_require__.O = (result, chunkIds, fn, priority) => {
-/******/ 			if(chunkIds) {
-/******/ 				priority = priority || 0;
-/******/ 				for(var i = deferred.length; i > 0 && deferred[i - 1][2] > priority; i--) deferred[i] = deferred[i - 1];
-/******/ 				deferred[i] = [chunkIds, fn, priority];
-/******/ 				return;
-/******/ 			}
-/******/ 			var notFulfilled = Infinity;
-/******/ 			for (var i = 0; i < deferred.length; i++) {
-/******/ 				var [chunkIds, fn, priority] = deferred[i];
-/******/ 				var fulfilled = true;
-/******/ 				for (var j = 0; j < chunkIds.length; j++) {
-/******/ 					if ((priority & 1 === 0 || notFulfilled >= priority) && Object.keys(__webpack_require__.O).every((key) => (__webpack_require__.O[key](chunkIds[j])))) {
-/******/ 						chunkIds.splice(j--, 1);
-/******/ 					} else {
-/******/ 						fulfilled = false;
-/******/ 						if(priority < notFulfilled) notFulfilled = priority;
-/******/ 					}
-/******/ 				}
-/******/ 				if(fulfilled) {
-/******/ 					deferred.splice(i--, 1)
-/******/ 					var r = fn();
-/******/ 					if (r !== undefined) result = r;
-/******/ 				}
-/******/ 			}
-/******/ 			return result;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/jsonp chunk loading */
-/******/ 	(() => {
-/******/ 		// no baseURI
-/******/ 		
-/******/ 		// object to store loaded and loading chunks
-/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
-/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
-/******/ 		var installedChunks = {
-/******/ 			792: 0
-/******/ 		};
-/******/ 		
-/******/ 		// no chunk on demand loading
-/******/ 		
-/******/ 		// no prefetching
-/******/ 		
-/******/ 		// no preloaded
-/******/ 		
-/******/ 		// no HMR
-/******/ 		
-/******/ 		// no HMR manifest
-/******/ 		
-/******/ 		__webpack_require__.O.j = (chunkId) => (installedChunks[chunkId] === 0);
-/******/ 		
-/******/ 		// install a JSONP callback for chunk loading
-/******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
-/******/ 			var [chunkIds, moreModules, runtime] = data;
-/******/ 			// add "moreModules" to the modules object,
-/******/ 			// then flag all "chunkIds" as loaded and fire callback
-/******/ 			var moduleId, chunkId, i = 0;
-/******/ 			if(chunkIds.some((id) => (installedChunks[id] !== 0))) {
-/******/ 				for(moduleId in moreModules) {
-/******/ 					if(__webpack_require__.o(moreModules, moduleId)) {
-/******/ 						__webpack_require__.m[moduleId] = moreModules[moduleId];
-/******/ 					}
-/******/ 				}
-/******/ 				if(runtime) var result = runtime(__webpack_require__);
-/******/ 			}
-/******/ 			if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
-/******/ 			for(;i < chunkIds.length; i++) {
-/******/ 				chunkId = chunkIds[i];
-/******/ 				if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
-/******/ 					installedChunks[chunkId][0]();
-/******/ 				}
-/******/ 				installedChunks[chunkId] = 0;
-/******/ 			}
-/******/ 			return __webpack_require__.O(result);
-/******/ 		}
-/******/ 		
-/******/ 		var chunkLoadingGlobal = self["webpackChunkudl"] = self["webpackChunkudl"] || [];
-/******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
-/******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/nonce */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nc = undefined;
-/******/ 	})();
-/******/ 	
-/************************************************************************/
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [562], () => (__webpack_require__(506)))
-/******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
+/******/ 	// This entry module can't be inlined because the eval-source-map devtool is used.
+/******/ 	var __webpack_exports__ = {};
+/******/ 	__webpack_modules__[506]();
 /******/ 	
 /******/ })()
 ;
