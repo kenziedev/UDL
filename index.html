@@ -3,219 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UDL 웹 접근성 도구 데모</title>
+    <title>UDL 웹 접근성 도구</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* 기본 스타일 */
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #2c5282;
+            --text-color: #2d3748;
+            --light-bg: #f8fafc;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
+            color: var(--text-color);
+            background-color: var(--light-bg);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        header {
-            text-align: center;
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 80px 0;
             margin-bottom: 60px;
         }
 
-        h1 {
-            font-size: 2.5em;
-            color: #2c5282;
-            margin-bottom: 16px;
-        }
-
-        .subtitle {
-            font-size: 1.2em;
-            color: #4a5568;
-            margin-bottom: 24px;
-        }
-
-        .demo-section {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .demo-section h2 {
-            color: #2c5282;
-            margin-top: 0;
-            margin-bottom: 24px;
-            font-size: 1.8em;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-
         .feature-card {
-            background: white;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
+            height: 100%;
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .feature-card h3 {
-            color: #2c5282;
-            margin-top: 0;
-            margin-bottom: 16px;
+        .feature-card:hover {
+            transform: translateY(-5px);
         }
 
-        .feature-card p {
-            color: #4a5568;
-            margin: 0;
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
         }
 
         .test-area {
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 24px;
-            margin-top: 24px;
-        }
-
-        .test-area h3 {
-            color: #2c5282;
-            margin-top: 0;
-            margin-bottom: 16px;
-        }
-
-        .test-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .test-item {
-            padding: 16px;
-            border-radius: 6px;
+            padding: 1.5rem;
+            border-radius: 8px;
             text-align: center;
             font-weight: 500;
+            margin-bottom: 1rem;
         }
 
         .test-item.good-contrast {
-            background-color: #2c5282;
+            background-color: var(--secondary-color);
             color: white;
         }
 
         .test-item.poor-contrast {
             background-color: #F28B15;
-            color: #f8f9fa;
+            color: white;
         }
 
         .test-item.very-poor-contrast {
             background-color: #e2e8f0;
-            color: #f8f9fa;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background-color: #3a7bd5;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.2s;
-        }
-
-        .cta-button:hover {
-            background-color: #2c5282;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            padding: 24px;
             color: #4a5568;
-            border-top: 1px solid #e2e8f0;
+        }
+
+        .bookmarklet-btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(58, 123, 213, 0.2);
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .bookmarklet-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(58, 123, 213, 0.3);
+        }
+
+        .section-title {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .bookmarklet-guide {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .bookmarklet-btn.btn-lg {
+            font-size: 1.2rem;
+            padding: 1rem 2.5rem;
+        }
+
+        .step-item {
+            font-size: 0.95rem;
+            color: white;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .step-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .usage-steps .bi {
+            font-size: 1.1rem;
         }
     </style>
 <script defer src="/main.bundle.js"></script></head>
 <body>
-    <div class="container">
-        <header>
-            <h1>UDL 웹 접근성 도구</h1>
-            <p class="subtitle">웹 접근성과 UDL(Universal Design for Learning) 원칙을 쉽게 확인하고 개선할 수 있는 도구</p>
-        </header>
-
-        <section class="demo-section">
-            <h2>주요 기능</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h3>명도 대비 검사</h3>
-                    <p>텍스트와 배경색의 명도 대비를 검사하여 WCAG 2.1 기준을 충족하는지 확인합니다.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>색맹 시뮬레이션</h3>
-                    <p>다양한 색맹 유형을 시뮬레이션하여 웹사이트의 색상 접근성을 테스트합니다.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>UDL 원칙 분석</h3>
-                    <p>웹사이트가 UDL 원칙을 얼마나 잘 따르고 있는지 분석하고 개선점을 제안합니다.</p>
+    <!-- 히어로 섹션 -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-4">UDL 웹 접근성 도구</h1>
+                    <p class="lead mb-4">웹 접근성과 UDL(Universal Design for Learning) 원칙을 쉽게 확인하고 개선할 수 있는 도구</p>
+                    <div class="bookmarklet-guide mb-4">
+                        <p class="text-light mb-3">아래 버튼을 북마크바에 드래그하여 추가하세요</p>
+                        <a href="javascript:(function(){var script=document.createElement('script');script.src='https://kenziedev.github.io/UDL/main.bundle.js?v=' + Date.now();document.body.appendChild(script);})();"
+                           class="bookmarklet-btn btn-lg"
+                           draggable="true"
+                           title="UDL 접근성 검사 북마클릿">
+                            <i class="bi bi-bookmark-plus me-2"></i>UDL 접근성 검사 북마클릿
+                        </a>
+                        <div class="mt-3">
+                            <small class="text-light opacity-75">
+                                <i class="bi bi-info-circle me-1"></i>
+                                북마크바에 추가 후, 검사하고 싶은 웹사이트에서 북마크를 클릭하면 도구가 실행됩니다
+                            </small>
+                        </div>
+                    </div>
+                    <div class="usage-steps mt-4">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="step-item bg-white bg-opacity-10 p-3 rounded">
+                                    <i class="bi bi-1-circle-fill me-2"></i>
+                                    북마크바에 드래그
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="step-item bg-white bg-opacity-10 p-3 rounded">
+                                    <i class="bi bi-2-circle-fill me-2"></i>
+                                    웹사이트 방문
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="step-item bg-white bg-opacity-10 p-3 rounded">
+                                    <i class="bi bi-3-circle-fill me-2"></i>
+                                    북마크 클릭
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="demo-section">
-            <h2>테스트 영역</h2>
-            <p>아래 영역에서 명도 대비 검사 기능을 테스트해볼 수 있습니다.</p>
-            
-            <div class="test-area">
-                <h3>명도 대비 테스트 샘플</h3>
-                <div class="test-content">
+    <!-- 주요 기능 섹션 -->
+    <section class="container mb-5">
+        <h2 class="section-title">주요 기능</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="bi bi-contrast"></i>
+                        </div>
+                        <h3 class="h5 card-title">명도 대비 검사</h3>
+                        <p class="card-text">텍스트와 배경색의 명도 대비를 WCAG 2.1 기준에 맞춰 검사하고, 개선이 필요한 부분을 자세히 분석합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <h3 class="h5 card-title">색맹 시뮬레이션</h3>
+                        <p class="card-text">다양한 색맹 유형을 시뮬레이션하여 웹사이트의 색상 접근성을 테스트하고 개선점을 제안합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h3 class="h5 card-title">AI 제안</h3>
+                        <p class="card-text">인공지능이 웹사이트의 접근성을 분석하고, UDL 원칙에 맞춘 구체적인 개선 방안을 제시합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="bi bi-list-check"></i>
+                        </div>
+                        <h3 class="h5 card-title">웹 접근성 항목</h3>
+                        <p class="card-text">WCAG 2.1 가이드라인을 기반으로 한 웹 접근성 검사 항목을 제공하고, 상세한 분석 결과를 보여줍니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                        <h3 class="h5 card-title">AI 챗봇</h3>
+                        <p class="card-text">접근성 관련 질문에 대해 실시간으로 답변하고, 웹사이트 개선을 위한 맞춤형 조언을 제공합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 테스트 영역 -->
+    <section class="container mb-5">
+        <div class="test-area">
+            <h2 class="section-title">명도 대비 테스트</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
                     <div class="test-item good-contrast">
                         좋은 대비 (4.5:1 이상)
                     </div>
+                </div>
+                <div class="col-md-4">
                     <div class="test-item poor-contrast">
                         낮은 대비 (3:1 미만)
                     </div>
+                </div>
+                <div class="col-md-4">
                     <div class="test-item very-poor-contrast">
                         매우 낮은 대비 (2:1 미만)
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div style="text-align: center; margin-top: 32px;">
-                <a href="#" class="cta-button" onclick="togglePanel()">접근성 도구 열기</a>
-            </div>
-        </section>
-
-        <!-- 북마클릿 추가 영역 -->
-        <section class="demo-section" style="text-align:center;">
-            <h2>북마클릿으로 빠르게 실행</h2>
-            <p style="margin-bottom:18px; color:#4a5568;">아래 버튼을 <b>드래그해서 북마크바에 추가</b>하세요.<br>어떤 웹사이트에서든 클릭하면 UDL 접근성 도구가 실행됩니다.</p>
-            <a
-                href="javascript:(function(){var script=document.createElement('script');script.src='http://localhost:8080/main.bundle.js';document.body.appendChild(script);})();"
-                style="display:inline-block;padding:12px 28px;background:#3a7bd5;color:#fff;border-radius:6px;font-weight:600;text-decoration:none;box-shadow:0 2px 8px rgba(58,123,213,0.08);cursor:move;font-size:1.1em;"
-                title="UDL 접근성 검사 북마클릿"
-                draggable="true"
-            >UDL 접근성 검사 북마클릿</a>
-            <div style="margin-top:14px;font-size:0.97em;color:#718096;">(개발 서버용: <span style='font-family:monospace;'>localhost:8080</span> 기준입니다. 배포 후에는 주소를 변경해 주세요)</div>
-        </section>
-    </div>
-
-    <footer>
-        <p>UDL 웹 접근성 도구 © 2024</p>
+    <!-- 푸터 -->
+    <footer class="bg-white py-4 mt-5 border-top">
+        <div class="container text-center">
+            <p class="text-muted mb-0">UDL 웹 접근성 도구 © 2024</p>
+        </div>
     </footer>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- UDL 웹 접근성 도구 스크립트 -->
     <script type="module" src="src/main.js"></script>
     <script>
         function togglePanel() {
-            // 패널 토글 로직은 main.js에서 처리됨
             const panel = document.getElementById('udl-accessibility-panel');
             if (panel) {
                 panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
