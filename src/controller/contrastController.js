@@ -4,14 +4,29 @@ import { parseColor, calculateContrast, removeHighlights } from '../utils/contra
 /**
  * 색상 대비 검사 실행
  */
-export function checkColorContrast() {
-    const contrastContent = document.getElementById('tab-content-contrast');
-    contrastContent.innerHTML = '<div class="loading">색상 대비 검사 중...</div>';
-
-    setTimeout(() => {
-        const results = analyzeColorContrast();
+export async function checkColorContrast() {
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'loading';
+    loadingMessage.textContent = '명도 대비 검사 중...';
+    
+    const tabContent = document.getElementById('tab-content-contrast');
+    tabContent.innerHTML = '';
+    tabContent.appendChild(loadingMessage);
+    
+    try {
+        // 분석 실행 및 결과 대기
+        const results = await analyzeColorContrast();
+        
+        // 결과 표시
         displayContrastResults(results);
-    }, 500);
+    } catch (error) {
+        console.error('Color contrast check failed:', error);
+        tabContent.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+                명도 대비 검사 중 오류가 발생했습니다. 페이지를 새로고침하고 다시 시도해주세요.
+            </div>
+        `;
+    }
 }
 
 export function displayContrastResults(results) {
