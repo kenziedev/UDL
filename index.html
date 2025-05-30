@@ -259,10 +259,15 @@
         </div>
         
         <div class="actions">
+            <a href="javascript:(function(){var script=document.createElement('script');script.src='http://localhost:3000/main.bundle.js';document.body.appendChild(script);})()" 
+               class="btn btn-secondary" 
+               onclick="alert('이 링크를 북마크바로 드래그해서 사용하세요!'); return false;">
+                📌 UDL 접근성 검사 (북마클릿 - 개발용)
+            </a>
             <a href="javascript:(function(){var script=document.createElement('script');script.src='https://kenziedev.github.io/UDL/main.bundle.js';document.body.appendChild(script);})()" 
                class="btn btn-secondary" 
                onclick="alert('이 링크를 북마크바로 드래그해서 사용하세요!'); return false;">
-                📌 UDL 접근성 검사 (북마클릿)
+                📌 UDL 접근성 검사 (북마클릿 - 배포용)
             </a>
             <a href="https://github.com/kenziedev/UDL" class="btn btn-secondary" target="_blank">
                 📚 GitHub 저장소
@@ -316,5 +321,5 @@
             document.getElementById('urlInput').value = 'https://';
         }
     </script>
-<script defer src="/999.bundle.js"></script><script defer src="/demo.bundle.js"></script></body>
+<script defer src="/39.bundle.js"></script><script defer src="/demo.bundle.js"></script></body>
 </html> 
