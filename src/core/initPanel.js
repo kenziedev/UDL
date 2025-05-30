@@ -1,6 +1,6 @@
 // src/core/initPanel.js
 
-import { checkColorContrast } from './checkColorContrast.js';
+import { checkColorContrast } from '../controller/contrastController.js';
 import { analyzeWCAG } from './analyzeWCAG.js';
 import { analyzeForAI } from './analyzeForAI.js';
 import { checkColorBlindness } from './colorBlindness.js';

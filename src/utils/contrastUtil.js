@@ -43,3 +43,36 @@ export function calculateContrast(a, b) {
     const L2 = calculateLuminance(b);
     return Math.round(((Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)) * 100) / 100;
 }
+
+/**
+ * WCAG 대비 기준 평가
+ * @param {number} ratio 대비율
+ * @param {boolean} isLargeText 큰 텍스트 여부
+ * @returns {Object} {aa, aaa} 평가 결과
+ */
+export function evaluateWCAGCompliance(ratio, isLargeText) {
+    const aaThreshold = isLargeText ? 3 : 4.5;
+    const aaaThreshold = isLargeText ? 4.5 : 7;
+    
+    return {
+        aa: ratio >= aaThreshold,
+        aaa: ratio >= aaaThreshold
+    };
+}
+
+/**
+ * 대비율에 따른 상태 텍스트 반환
+ * @param {number} ratio 
+ * @returns {Object} {status, className}
+ */
+export function getContrastStatus(ratio) {
+    if (ratio >= 7) {
+        return { status: 'WCAG AA/AAA 통과', className: 'pass' };
+    } else if (ratio >= 4.5) {
+        return { status: 'WCAG AA 통과 (AAA 실패)', className: 'pass' };
+    } else if (ratio >= 3) {
+        return { status: '큰 텍스트만 WCAG AA 통과', className: 'partial' };
+    } else {
+        return { status: 'WCAG 기준 실패', className: 'fail' };
+    }
+}

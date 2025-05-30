@@ -1,71 +1,15 @@
-import { parseColor, calculateContrast, rgbToHex } from '../utils/contrastUtil.js';
-import { removeHighlights } from '../utils/contrastUtil.js'; // highlight 지울 때
+import { analyzeColorContrast } from '../core/checkColorContrast.js';
+import { parseColor, calculateContrast, removeHighlights } from '../utils/contrastUtil.js';
 
+/**
+ * 색상 대비 검사 실행
+ */
 export function checkColorContrast() {
     const contrastContent = document.getElementById('tab-content-contrast');
     contrastContent.innerHTML = '<div class="loading">색상 대비 검사 중...</div>';
 
     setTimeout(() => {
-        const els = Array.from(document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, a, span, li, td, th, div, label, button'))
-            .filter(el => {
-                if (el.closest('#udl-accessibility-panel')) return false;
-                const txt = el.textContent.trim();
-                if (!txt) return false;
-                const s = window.getComputedStyle(el);
-                return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0' && el.offsetParent !== null;
-            });
-
-        const results = els.map(el => {
-            const s = window.getComputedStyle(el);
-            let bg = s.backgroundColor;
-            let bgElement = el;
-
-            if (bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') {
-                let p = el.parentElement;
-                while (p) {
-                    const ps = window.getComputedStyle(p);
-                    const pb = ps.backgroundColor;
-                    if (pb !== 'transparent' && pb !== 'rgba(0, 0, 0, 0)') {
-                        bg = pb;
-                        bgElement = p;
-                        break;
-                    }
-                    p = p.parentElement;
-                }
-            }
-
-            if (bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') {
-                const docStyle = window.getComputedStyle(document.body);
-                bg = docStyle.backgroundColor || 'rgb(255,255,255)';
-                bgElement = document.body;
-            }
-
-            const tc = parseColor(s.color);
-            const bc = parseColor(bg);
-            const cr = calculateContrast(tc, bc);
-
-            const fs = parseFloat(s.fontSize);
-            const fw = s.fontWeight;
-            const isLargeText = fs >= 18 || (fs >= 14 && (parseInt(fw) >= 700 || fw === 'bold'));
-
-            return {
-                el,
-                bgElement,
-                text: el.textContent.trim().slice(0, 30) + (el.textContent.length > 30 ? '...' : ''),
-                contrast: cr,
-                aa: isLargeText ? cr >= 3 : cr >= 4.5,
-                aaa: isLargeText ? cr >= 4.5 : cr >= 7,
-                fs,
-                fw,
-                textColor: s.color,
-                textColorHex: rgbToHex(tc.r, tc.g, tc.b),
-                bgColor: bg,
-                bgColorHex: rgbToHex(bc.r, bc.g, bc.b),
-                elementHTML: el.outerHTML.split('>')[0] + '>',
-                bgElementHTML: bgElement !== el ? bgElement.outerHTML.split('>')[0] + '>' : ''
-            };
-        });
-
+        const results = analyzeColorContrast();
         displayContrastResults(results);
     }, 500);
 }
@@ -73,6 +17,20 @@ export function checkColorContrast() {
 export function displayContrastResults(results) {
     const c = document.getElementById('tab-content-contrast');
     c.innerHTML = '';
+
+    // 디버깅을 위한 로그 추가
+    console.log('Results structure:', results.map(r => ({
+        text: r.text,
+        textColor: r.textColor,
+        textColorHex: r.textColorHex,
+        backgroundColor: r.backgroundColor,
+        backgroundColorHex: r.backgroundColorHex,
+        elementHTML: r.elementHTML,
+        backgroundElementHTML: r.backgroundElementHTML,
+        contrast: r.contrast,
+        aa: r.aa,
+        aaa: r.aaa
+    })));
 
     const fails = results.filter(r => !r.aa);
     const passes = results.filter(r => r.aa);
@@ -330,17 +288,17 @@ export function displayContrastResults(results) {
             </div>
             <div class="item-details">
               <div class="contrast-info-row">
-                <div class="color-sample-box" style="color: ${r.textColorHex}; background-color: ${r.bgColorHex}">Abc</div>
+                <div class="color-sample-box" style="color: ${r.textColorHex}; background-color: ${r.backgroundColorHex}">Abc</div>
                 <div class="contrast-ratio">
-                  <div class="ratio-value low-ratio">${criteriaText} - 대비율: <strong>${r.contrast.toFixed(2)}:1</strong></div>
+                  <div class="ratio-value low-ratio">${criteriaText} - 대비율:${r.contrast.toFixed(2)}:1</div>
                   <div class="color-info">
                     <span class="color-chip">
                       <span class="color-preview" style="background-color:${r.textColorHex}"></span>
                       <span class="color-code">${r.textColorHex}</span>
                     </span>
                     <span class="color-chip">
-                      <span class="color-preview" style="background-color:${r.bgColorHex}"></span>
-                      <span class="color-code">${r.bgColorHex}</span>
+                      <span class="color-preview" style="background-color:${r.backgroundColorHex}"></span>
+                      <span class="color-code">${r.backgroundColorHex}</span>
                     </span>
                   </div>
                 </div>
@@ -349,7 +307,7 @@ export function displayContrastResults(results) {
                 <button class="code-toggle">코드 보기</button>
                 <div class="code-content">
                   <code class="element-html">텍스트 요소: ${escapeHTML(r.elementHTML)}</code>
-                  ${r.bgElementHTML ? `<code class="bg-element-html">배경 요소: ${escapeHTML(r.bgElementHTML)}</code>` : ''}
+                  ${r.backgroundElementHTML ? `<code class="bg-element-html">배경 요소: ${escapeHTML(r.backgroundElementHTML)}</code>` : ''}
                 </div>
               </div>
             </div>
@@ -374,8 +332,8 @@ export function displayContrastResults(results) {
                 }
 
                 removeHighlights();
-                r.el.classList.add('item-highlight');
-                r.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                r.element.classList.add('item-highlight');
+                r.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             };
 
             failItems.appendChild(item);
@@ -411,17 +369,17 @@ export function displayContrastResults(results) {
             </div>
             <div class="item-details">
               <div class="contrast-info-row">
-                <div class="color-sample-box" style="color: ${r.textColorHex}; background-color: ${r.bgColorHex}">Abc</div>
+                <div class="color-sample-box" style="color: ${r.textColorHex}; background-color: ${r.backgroundColorHex}">Abc</div>
                 <div class="contrast-ratio">
-                  <div class="ratio-value high-ratio">${criteriaText} - 대비율: <strong>${r.contrast.toFixed(2)}:1</strong></div>
+                  <div class="ratio-value high-ratio">${criteriaText} - 대비율:${r.contrast.toFixed(2)}:1</div>
                   <div class="color-info">
                     <span class="color-chip">
                       <span class="color-preview" style="background-color:${r.textColorHex}"></span>
                       <span class="color-code">${r.textColorHex}</span>
                     </span>
                     <span class="color-chip">
-                      <span class="color-preview" style="background-color:${r.bgColorHex}"></span>
-                      <span class="color-code">${r.bgColorHex}</span>
+                      <span class="color-preview" style="background-color:${r.backgroundColorHex}"></span>
+                      <span class="color-code">${r.backgroundColorHex}</span>
                     </span>
                   </div>
                 </div>
@@ -430,7 +388,7 @@ export function displayContrastResults(results) {
                 <button class="code-toggle">코드 보기</button>
                 <div class="code-content">
                   <code class="element-html">텍스트 요소: ${escapeHTML(r.elementHTML)}</code>
-                  ${r.bgElementHTML ? `<code class="bg-element-html">배경 요소: ${escapeHTML(r.bgElementHTML)}</code>` : ''}
+                  ${r.backgroundElementHTML ? `<code class="bg-element-html">배경 요소: ${escapeHTML(r.backgroundElementHTML)}</code>` : ''}
                 </div>
               </div>
             </div>
@@ -455,8 +413,8 @@ export function displayContrastResults(results) {
                 }
 
                 removeHighlights();
-                r.el.classList.add('item-highlight');
-                r.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                r.element.classList.add('item-highlight');
+                r.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             };
 
             passItems.appendChild(item);

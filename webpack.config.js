@@ -2,6 +2,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,13 +18,7 @@ export default {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: isProduction ? '/UDL/' : '/', // ⭐ 배포용은 /UDL/, 개발용은 /
-        clean: true,
-        library: {
-            type: 'module'
-        }
-    },
-    experiments: {
-        outputModule: true
+        clean: true
     },
     module: {
         rules: [
@@ -66,8 +61,23 @@ export default {
         },
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        new HtmlWebpackPlugin({
+            template: './index.html',
+            filename: 'index.html',
+            chunks: ['main'],
+            inject: true,
+            minify: isProduction ? {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeRedundantAttributes: true,
+                useShortDoctype: true,
+                removeEmptyAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                keepClosingSlash: true,
+                minifyJS: true,
+                minifyCSS: true,
+                minifyURLs: true,
+            } : false
         })
     ],
     devtool: isProduction ? 'source-map' : 'eval-source-map',
