@@ -188,256 +188,316 @@ async function analyzeElementContrast(element) {
 }
 
 /**
+ * CSS 변수 값을 실제 색상으로 변환
+ * @param {string} value 
+ * @returns {string}
+ */
+function resolveCSSVariable(value) {
+    if (!value || !value.startsWith('var(--')) return value;
+    
+    const varName = value.match(/var\(--([^)]+)\)/)[1];
+    const computedValue = getComputedStyle(document.documentElement)
+        .getPropertyValue(`--${varName}`).trim();
+    
+    return computedValue || value;
+}
+
+/**
+ * 색상 문자열을 RGB 객체로 변환
+ * @param {string} color 
+ * @returns {{r: number, g: number, b: number, a: number}}
+ */
+function parseColorWithAlpha(color) {
+    if (!color) return { r: 0, g: 0, b: 0, a: 0 };
+    
+    // CSS 변수 처리
+    color = resolveCSSVariable(color);
+    
+    // rgba 형식
+    const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (rgbaMatch) {
+        return {
+            r: parseInt(rgbaMatch[1]),
+            g: parseInt(rgbaMatch[2]),
+            b: parseInt(rgbaMatch[3]),
+            a: rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1
+        };
+    }
+    
+    // hex 형식
+    const hexMatch = color.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+    if (hexMatch) {
+        return {
+            r: parseInt(hexMatch[1], 16),
+            g: parseInt(hexMatch[2], 16),
+            b: parseInt(hexMatch[3], 16),
+            a: 1
+        };
+    }
+    
+    // 기본값
+    return { r: 0, g: 0, b: 0, a: 0 };
+}
+
+/**
+ * 두 색상을 알파 블렌딩
+ * @param {string} topColor - 위쪽 색상 (rgba)
+ * @param {string} bottomColor - 아래쪽 색상 (rgb)
+ * @returns {string} 혼합된 rgb 색상
+ */
+function blendColorsWithAlpha(topColor, bottomColor) {
+    const top = parseColorWithAlpha(topColor);
+    const bottom = parseColorWithAlpha(bottomColor);
+    
+    // 알파값이 0이면 아래쪽 색상 반환
+    if (top.a === 0) return bottomColor;
+    
+    // 알파값이 1이면 위쪽 색상 반환
+    if (top.a === 1) return topColor;
+    
+    // 알파 블렌딩
+    const r = Math.round(top.r * top.a + bottom.r * (1 - top.a));
+    const g = Math.round(top.g * top.a + bottom.g * (1 - top.a));
+    const b = Math.round(top.b * top.a + bottom.b * (1 - top.a));
+    
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+/**
+ * 여러 레이어의 반투명 배경색 혼합
+ * @param {Array<{color: string, element: Element}>} layers - 배경 레이어 배열 (아래에서 위로)
+ * @returns {string} 최종 배경색
+ */
+function blendMultipleLayers(layers) {
+    if (!layers || layers.length === 0) return 'rgb(255, 255, 255)';
+    
+    // 기본 배경색 (흰색)
+    let result = 'rgb(255, 255, 255)';
+    
+    // 아래 레이어부터 순서대로 혼합
+    for (const layer of layers) {
+        result = blendColorsWithAlpha(layer.color, result);
+    }
+    
+    return result;
+}
+
+/**
  * 배경색 찾기 (부모 요소 탐색 포함)
  * @param {Element} element 
  * @param {CSSStyleDeclaration} style 
  * @returns {Promise<Object>} {backgroundColor, backgroundElement}
  */
 async function findBackgroundColor(element, style) {
-    // 1. 특정 클래스를 가진 요소의 경우 특별 처리
-    if (element.classList.contains('bookmarklet-guide') || 
-        element.classList.contains('step-item') ||
-        element.closest('.bookmarklet-guide') ||
-        element.closest('.step-item')) {
-        // 히어로 섹션 찾기
-        const heroSection = element.closest('.hero-section');
-        if (heroSection) {
-            const heroStyle = window.getComputedStyle(heroSection);
-            const heroBgImage = heroStyle.backgroundImage;
-            if (heroBgImage && heroBgImage !== 'none') {
-                if (heroBgImage.includes('linear-gradient') || heroBgImage.includes('radial-gradient')) {
-                    const gradientColors = extractGradientColors(heroBgImage);
-                    if (gradientColors.length > 0) {
-                        const avgColor = averageGradientColors(gradientColors);
-                        return {
-                            backgroundColor: avgColor,
-                            backgroundElement: heroSection
-                        };
-                    }
-                }
-            }
-        }
-    }
+    let backgroundLayers = [];
+    let lastElement = null;
 
-    // 2. 현재 요소의 배경색이 반투명한 경우, 부모 요소의 배경을 먼저 확인
-    let backgroundColor = style.backgroundColor;
-    if (backgroundColor && backgroundColor.startsWith('rgba')) {
-        const rgbaMatch = backgroundColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-        if (rgbaMatch) {
-            const alpha = parseFloat(rgbaMatch[4] || '1');
-            // 반투명도가 0.5 이하인 경우 부모 배경을 우선 사용
-            if (alpha <= 0.5) {
-                // 히어로 섹션 확인
-                const heroSection = element.closest('.hero-section');
-                if (heroSection) {
-                    const heroStyle = window.getComputedStyle(heroSection);
-                    const heroBgImage = heroStyle.backgroundImage;
-                    if (heroBgImage && heroBgImage !== 'none') {
-                        if (heroBgImage.includes('linear-gradient') || heroBgImage.includes('radial-gradient')) {
-                            const gradientColors = extractGradientColors(heroBgImage);
-                            if (gradientColors.length > 0) {
-                                const avgColor = averageGradientColors(gradientColors);
-                                return {
-                                    backgroundColor: avgColor,
-                                    backgroundElement: heroSection
-                                };
-                            }
-                        }
-                    }
-                }
-                
-                const parentBg = await findParentBackgroundColor(element, true);
-                if (parentBg) {
-                    return parentBg;
-                }
-            }
-        }
-    }
+    // 요소의 시각적 위치 정보 가져오기
+    const getElementPosition = (el) => {
+        const rect = el.getBoundingClientRect();
+        return {
+            top: rect.top,
+            left: rect.left,
+            right: rect.right,
+            bottom: rect.bottom,
+            zIndex: parseInt(window.getComputedStyle(el).zIndex) || 0
+        };
+    };
 
-    // 3. 현재 요소의 배경 이미지 확인 (그라데이션)
-    const bgImage = style.backgroundImage;
-    if (bgImage && bgImage !== 'none') {
-        if (bgImage.includes('linear-gradient') || bgImage.includes('radial-gradient')) {
+    // 요소가 다른 요소 위에 있는지 확인
+    const isElementOverlapping = (el1, el2) => {
+        const pos1 = getElementPosition(el1);
+        const pos2 = getElementPosition(el2);
+        
+        return !(pos1.bottom < pos2.top || 
+                pos1.top > pos2.bottom || 
+                pos1.right < pos2.left || 
+                pos1.left > pos2.right);
+    };
+
+    // 요소의 배경색 정보 수집
+    const collectBackgroundInfo = (el) => {
+        const computedStyle = window.getComputedStyle(el);
+        let bgColor = computedStyle.backgroundColor;
+        const bgImage = computedStyle.backgroundImage;
+
+        // CSS 변수 처리
+        bgColor = resolveCSSVariable(bgColor);
+
+        // 그라데이션 배경 처리
+        if (bgImage && bgImage !== 'none' && 
+            (bgImage.includes('linear-gradient') || bgImage.includes('radial-gradient'))) {
             const gradientColors = extractGradientColors(bgImage);
             if (gradientColors.length > 0) {
                 const avgColor = averageGradientColors(gradientColors);
+                const colorWithAlpha = parseColorWithAlpha(avgColor);
                 return {
-                    backgroundColor: avgColor,
-                    backgroundElement: element
+                    color: avgColor,
+                    element: el,
+                    isOpaque: colorWithAlpha.a === 1,
+                    alpha: colorWithAlpha.a
                 };
             }
         }
-    }
-    
-    // 4. 현재 요소의 배경색 확인
-    if (backgroundColor) {
-        // rgba 색상 처리
-        if (backgroundColor.startsWith('rgba')) {
-            const rgbaMatch = backgroundColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-            if (rgbaMatch) {
-                const [_, r, g, b, a] = rgbaMatch;
-                const alpha = parseFloat(a || '1');
-                
-                // 반투명 배경인 경우 부모 요소의 배경색과 혼합
-                if (alpha < 1) {
-                    // 히어로 섹션 확인
-                    const heroSection = element.closest('.hero-section');
-                    if (heroSection) {
-                        const heroStyle = window.getComputedStyle(heroSection);
-                        const heroBgImage = heroStyle.backgroundImage;
-                        if (heroBgImage && heroBgImage !== 'none') {
-                            if (heroBgImage.includes('linear-gradient') || heroBgImage.includes('radial-gradient')) {
-                                const gradientColors = extractGradientColors(heroBgImage);
-                                if (gradientColors.length > 0) {
-                                    const avgColor = averageGradientColors(gradientColors);
-                                    const mixedColor = blendColors(
-                                        `rgb(${r}, ${g}, ${b})`,
-                                        avgColor,
-                                        alpha
-                                    );
-                                    return {
-                                        backgroundColor: mixedColor,
-                                        backgroundElement: element
-                                    };
-                                }
-                            }
-                        }
-                    }
-                    
-                    const parentBg = await findParentBackgroundColor(element, true);
-                    if (parentBg) {
-                        const mixedColor = blendColors(
-                            `rgb(${r}, ${g}, ${b})`,
-                            parentBg.backgroundColor,
-                            alpha
-                        );
-                        return {
-                            backgroundColor: mixedColor,
-                            backgroundElement: element
-                        };
-                    }
-                }
-                
-                // 완전 불투명한 경우 rgb로 변환
-                return {
-                    backgroundColor: `rgb(${r}, ${g}, ${b})`,
-                    backgroundElement: element
-                };
-            }
+
+        // 일반 배경색 처리
+        if (bgColor && !isTransparent(bgColor)) {
+            const colorWithAlpha = parseColorWithAlpha(bgColor);
+            return {
+                color: bgColor,
+                element: el,
+                isOpaque: colorWithAlpha.a === 1,
+                alpha: colorWithAlpha.a
+            };
         }
-        
-        if (!isTransparent(backgroundColor)) {
-            return { backgroundColor, backgroundElement: element };
-        }
-    }
-    
-    // 5. 부모 요소 탐색
-    let parent = element.parentElement;
-    let depth = 0;
-    const maxDepth = 5;
-    
-    while (parent && depth < maxDepth) {
-        // 히어로 섹션 확인
-        if (parent.classList.contains('hero-section')) {
-            const parentStyle = window.getComputedStyle(parent);
-            const parentBgImage = parentStyle.backgroundImage;
-            if (parentBgImage && parentBgImage !== 'none') {
-                if (parentBgImage.includes('linear-gradient') || parentBgImage.includes('radial-gradient')) {
-                    const gradientColors = extractGradientColors(parentBgImage);
-                    if (gradientColors.length > 0) {
-                        const avgColor = averageGradientColors(gradientColors);
-                        return {
-                            backgroundColor: avgColor,
-                            backgroundElement: parent
-                        };
-                    }
-                }
-            }
-        }
-        
-        const parentStyle = window.getComputedStyle(parent);
-        
-        // 부모 요소의 배경 이미지 확인
-        const parentBgImage = parentStyle.backgroundImage;
-        if (parentBgImage && parentBgImage !== 'none') {
-            if (parentBgImage.includes('linear-gradient') || parentBgImage.includes('radial-gradient')) {
-                const gradientColors = extractGradientColors(parentBgImage);
-                if (gradientColors.length > 0) {
-                    const avgColor = averageGradientColors(gradientColors);
-                    return {
-                        backgroundColor: avgColor,
-                        backgroundElement: parent
-                    };
-                }
-            }
-        }
-        
-        // 부모 요소의 배경색 확인
-        const parentBg = parentStyle.backgroundColor;
-        if (parentBg) {
-            // rgba 색상 처리
-            if (parentBg.startsWith('rgba')) {
-                const rgbaMatch = parentBg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-                if (rgbaMatch) {
-                    const [_, r, g, b, a] = rgbaMatch;
-                    const alpha = parseFloat(a || '1');
-                    
-                    // 반투명 배경인 경우 상위 부모 요소의 배경색과 혼합
-                    if (alpha < 1) {
-                        const grandParentBg = await findParentBackgroundColor(parent, true);
-                        if (grandParentBg) {
-                            const mixedColor = blendColors(
-                                `rgb(${r}, ${g}, ${b})`,
-                                grandParentBg.backgroundColor,
-                                alpha
-                            );
-                            return {
-                                backgroundColor: mixedColor,
-                                backgroundElement: parent
-                            };
-                        }
-                    }
-                    
-                    // 완전 불투명한 경우 rgb로 변환
-                    return {
-                        backgroundColor: `rgb(${r}, ${g}, ${b})`,
-                        backgroundElement: parent
-                    };
-                }
-            }
+
+        return null;
+    };
+
+    // 요소의 실제 배경색 찾기 (샘플링 방식)
+    const findSampledBackground = (el) => {
+        const pos = getElementPosition(el);
+        const centerX = Math.round((pos.left + pos.right) / 2);
+        const centerY = Math.round((pos.top + pos.bottom) / 2);
+
+        // 요소의 모든 모서리와 중앙점 샘플링
+        const samplePoints = [
+            { x: Math.round(pos.left + 5), y: Math.round(pos.top + 5) },  // 좌상단
+            { x: Math.round(pos.right - 5), y: Math.round(pos.top + 5) }, // 우상단
+            { x: centerX, y: centerY },                                    // 중앙
+            { x: Math.round(pos.left + 5), y: Math.round(pos.bottom - 5) },// 좌하단
+            { x: Math.round(pos.right - 5), y: Math.round(pos.bottom - 5) }// 우하단
+        ];
+
+        // 각 샘플링 포인트에서 배경 레이어 수집
+        const sampledLayers = new Map(); // element -> {color, alpha} 매핑
+
+        for (const point of samplePoints) {
+            const elementsAtPoint = document.elementsFromPoint(point.x, point.y);
+            const elementsBelow = elementsAtPoint.slice(elementsAtPoint.indexOf(el) + 1);
             
-            if (!isTransparent(parentBg)) {
-                return { backgroundColor: parentBg, backgroundElement: parent };
+            for (const belowEl of elementsBelow) {
+                const bgInfo = collectBackgroundInfo(belowEl);
+                if (bgInfo) {
+                    sampledLayers.set(belowEl, {
+                        color: bgInfo.color,
+                        alpha: bgInfo.alpha
+                    });
+                }
             }
         }
-        
-        parent = parent.parentElement;
-        depth++;
-    }
-    
-    // 6. body 배경 확인
-    const bodyStyle = window.getComputedStyle(document.body);
-    const bodyBgImage = bodyStyle.backgroundImage;
-    
-    if (bodyBgImage && bodyBgImage !== 'none') {
-        if (bodyBgImage.includes('linear-gradient') || bodyBgImage.includes('radial-gradient')) {
-            const gradientColors = extractGradientColors(bodyBgImage);
-            if (gradientColors.length > 0) {
-                const avgColor = averageGradientColors(gradientColors);
-                return {
-                    backgroundColor: avgColor,
-                    backgroundElement: document.body
-                };
+
+        // 모든 샘플링 포인트에서 공통으로 발견된 배경 레이어만 사용
+        return Array.from(sampledLayers.entries())
+            .filter(([el, info]) => {
+                return samplePoints.every(point => {
+                    const elementsAtPoint = document.elementsFromPoint(point.x, point.y);
+                    return elementsAtPoint.includes(el);
+                });
+            })
+            .sort((a, b) => {
+                const zIndexA = parseInt(window.getComputedStyle(a[0]).zIndex) || 0;
+                const zIndexB = parseInt(window.getComputedStyle(b[0]).zIndex) || 0;
+                return zIndexB - zIndexA;
+            });
+    };
+
+    // 요소의 실제 배경색 찾기 (기존 방식)
+    const findVisualBackground = (el) => {
+        const pos = getElementPosition(el);
+        const centerX = (pos.left + pos.right) / 2;
+        const centerY = (pos.top + pos.bottom) / 2;
+
+        // 요소 아래에 있는 모든 요소들 찾기
+        const elementsBelow = Array.from(document.elementsFromPoint(centerX, centerY))
+            .filter(e => e !== el && isElementOverlapping(el, e))
+            .sort((a, b) => {
+                const posA = getElementPosition(a);
+                const posB = getElementPosition(b);
+                return posB.zIndex - posA.zIndex;
+            });
+
+        const layers = [];
+        for (const belowEl of elementsBelow) {
+            const bgInfo = collectBackgroundInfo(belowEl);
+            if (bgInfo) {
+                layers.push(bgInfo);
+                if (bgInfo.isOpaque) {
+                    break;
+                }
             }
         }
+        return layers;
+    };
+
+    // 1. 요소 자체의 배경색 확인
+    const selfBgInfo = collectBackgroundInfo(element);
+    if (selfBgInfo) {
+        if (selfBgInfo.isOpaque) {
+            return {
+                backgroundColor: selfBgInfo.color,
+                backgroundElement: element
+            };
+        }
+        backgroundLayers.push(selfBgInfo);
     }
-    
-    const bodyBg = bodyStyle.backgroundColor;
-    if (!isTransparent(bodyBg)) {
-        return { backgroundColor: bodyBg, backgroundElement: document.body };
+
+    // 2. 샘플링 방식으로 배경색 찾기
+    const sampledLayers = findSampledBackground(element);
+    if (sampledLayers.length > 0) {
+        let finalColor = 'rgb(255, 255, 255)';
+        let lastElement = document.body;
+
+        for (const [el, info] of sampledLayers) {
+            finalColor = blendColorsWithAlpha(info.color, finalColor);
+            lastElement = el;
+            if (info.alpha === 1) {
+                break;
+            }
+        }
+
+        return {
+            backgroundColor: finalColor,
+            backgroundElement: lastElement
+        };
     }
-    
-    // 7. 기본값 사용
+
+    // 3. 기존 방식으로 배경색 찾기
+    const visualLayers = findVisualBackground(element);
+    if (visualLayers.length > 0) {
+        backgroundLayers.push(...visualLayers);
+    }
+
+    // 4. 부모 요소 탐색
+    let el = element.parentElement;
+    while (el) {
+        const bgInfo = collectBackgroundInfo(el);
+        if (bgInfo) {
+            backgroundLayers.push(bgInfo);
+            if (bgInfo.isOpaque) {
+                break;
+            }
+        }
+        lastElement = el;
+        el = el.parentElement;
+    }
+
+    // 5. body 배경색 처리
+    const bodyBgInfo = collectBackgroundInfo(document.body);
+    if (bodyBgInfo && bodyBgInfo.color !== 'rgb(255, 255, 255)') {
+        backgroundLayers.push(bodyBgInfo);
+    }
+
+    // 최종 배경색 계산
+    if (backgroundLayers.length > 0) {
+        const finalColor = blendMultipleLayers(backgroundLayers);
+        return {
+            backgroundColor: finalColor,
+            backgroundElement: lastElement || document.body
+        };
+    }
+
+    // 폴백: 기본 흰색 배경
     return {
         backgroundColor: 'rgb(255, 255, 255)',
         backgroundElement: document.body
@@ -522,89 +582,6 @@ function isLargeTextSize(fontSize, fontWeight) {
  */
 function truncateText(text, maxLength) {
     return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-}
-
-/**
- * 두 색상을 알파값에 따라 혼합
- * @param {string} color1 - 전경색 (rgba)
- * @param {string} color2 - 배경색 (rgb)
- * @param {number} alpha - 알파값
- * @returns {string} 혼합된 rgb 색상
- */
-function blendColors(color1, color2, alpha) {
-    const c1 = parseColor(color1);
-    const c2 = parseColor(color2);
-    
-    const r = Math.round(c1.r * alpha + c2.r * (1 - alpha));
-    const g = Math.round(c1.g * alpha + c2.g * (1 - alpha));
-    const b = Math.round(c1.b * alpha + c2.b * (1 - alpha));
-    
-    return `rgb(${r}, ${g}, ${b})`;
-}
-
-/**
- * 부모 요소의 배경색 찾기
- * @param {Element} element 
- * @param {boolean} checkGradient - 그라데이션 배경을 우선적으로 확인할지 여부
- * @returns {Promise<Object|null>} {backgroundColor, backgroundElement} 또는 null
- */
-async function findParentBackgroundColor(element, checkGradient = false) {
-    let parent = element.parentElement;
-    let depth = 0;
-    const maxDepth = 5;
-    
-    while (parent && depth < maxDepth) {
-        const parentStyle = window.getComputedStyle(parent);
-        
-        // 그라데이션 배경 우선 확인
-        if (checkGradient) {
-            const parentBgImage = parentStyle.backgroundImage;
-            if (parentBgImage && parentBgImage !== 'none') {
-                if (parentBgImage.includes('linear-gradient') || parentBgImage.includes('radial-gradient')) {
-                    const gradientColors = extractGradientColors(parentBgImage);
-                    if (gradientColors.length > 0) {
-                        const avgColor = averageGradientColors(gradientColors);
-                        return {
-                            backgroundColor: avgColor,
-                            backgroundElement: parent
-                        };
-                    }
-                }
-            }
-        }
-        
-        const parentBg = parentStyle.backgroundColor;
-        if (!isTransparent(parentBg)) {
-            return { backgroundColor: parentBg, backgroundElement: parent };
-        }
-        
-        parent = parent.parentElement;
-        depth++;
-    }
-    
-    const bodyStyle = window.getComputedStyle(document.body);
-    if (checkGradient) {
-        const bodyBgImage = bodyStyle.backgroundImage;
-        if (bodyBgImage && bodyBgImage !== 'none') {
-            if (bodyBgImage.includes('linear-gradient') || bodyBgImage.includes('radial-gradient')) {
-                const gradientColors = extractGradientColors(bodyBgImage);
-                if (gradientColors.length > 0) {
-                    const avgColor = averageGradientColors(gradientColors);
-                    return {
-                        backgroundColor: avgColor,
-                        backgroundElement: document.body
-                    };
-                }
-            }
-        }
-    }
-    
-    const bodyBg = bodyStyle.backgroundColor;
-    if (!isTransparent(bodyBg)) {
-        return { backgroundColor: bodyBg, backgroundElement: document.body };
-    }
-    
-    return null;
 }
 
 /**
