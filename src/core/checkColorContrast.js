@@ -90,7 +90,7 @@ function isElementVisible(style, element) {
  */
 async function analyzeElementContrast(element) {
     const style = window.getComputedStyle(element);
-    const { backgroundColor, backgroundElement } = await findBackgroundColor(element, style);
+    const { backgroundColor, backgroundElement, isUncertain } = await findBackgroundColor(element, style);
     
     const textColor = parseColor(style.color);
     const bgColor = parseColor(backgroundColor);
@@ -139,16 +139,20 @@ async function analyzeElementContrast(element) {
     
     // 상태 메시지 생성
     let status = '실패';
-    if (isAAAPass) {
+    if (isUncertain) {
+        status = '판단불가';
+    } else if (isAAAPass) {
         status = 'AAA';
     } else if (isAAPass) {
         status = 'AA';
     }
     
     // 텍스트 크기 상태 메시지 생성
-    const sizeStatus = isLargeText ? 
-        `큰 텍스트 (${aaThreshold}:1) - 대비율:${roundedContrast}:1` : 
-        `일반 텍스트 (${aaThreshold}:1) - 대비율:${roundedContrast}:1`;
+    const sizeStatus = isUncertain ? 
+        '배경색 판단 불가' : 
+        (isLargeText ? 
+            `큰 텍스트 (${aaThreshold}:1) - 대비율:${roundedContrast}:1` : 
+            `일반 텍스트 (${aaThreshold}:1) - 대비율:${roundedContrast}:1`);
     
     // 디버깅을 위한 상세 정보
     const textSizeInfo = {
@@ -169,6 +173,7 @@ async function analyzeElementContrast(element) {
         aa: isAAPass,
         aaa: isAAAPass,
         status,
+        isUncertain,
         fontSize,
         fontWeight,
         isLargeText,
@@ -286,11 +291,12 @@ function blendMultipleLayers(layers) {
  * 배경색 찾기 (부모 요소 탐색 포함)
  * @param {Element} element 
  * @param {CSSStyleDeclaration} style 
- * @returns {Promise<Object>} {backgroundColor, backgroundElement}
+ * @returns {Promise<Object>} {backgroundColor, backgroundElement, isUncertain}
  */
 async function findBackgroundColor(element, style) {
     let backgroundLayers = [];
     let lastElement = null;
+    let isUncertain = false;
 
     // 요소의 시각적 위치 정보 가져오기
     const getElementPosition = (el) => {
@@ -371,10 +377,12 @@ async function findBackgroundColor(element, style) {
 
         // 각 샘플링 포인트에서 배경 레이어 수집
         const sampledLayers = new Map(); // element -> {color, alpha} 매핑
+        const pointResults = new Map(); // point -> Set(elements)
 
         for (const point of samplePoints) {
             const elementsAtPoint = document.elementsFromPoint(point.x, point.y);
             const elementsBelow = elementsAtPoint.slice(elementsAtPoint.indexOf(el) + 1);
+            pointResults.set(point, new Set(elementsBelow));
             
             for (const belowEl of elementsBelow) {
                 const bgInfo = collectBackgroundInfo(belowEl);
@@ -388,11 +396,11 @@ async function findBackgroundColor(element, style) {
         }
 
         // 모든 샘플링 포인트에서 공통으로 발견된 배경 레이어만 사용
-        return Array.from(sampledLayers.entries())
+        const commonLayers = Array.from(sampledLayers.entries())
             .filter(([el, info]) => {
                 return samplePoints.every(point => {
-                    const elementsAtPoint = document.elementsFromPoint(point.x, point.y);
-                    return elementsAtPoint.includes(el);
+                    const elementsAtPoint = pointResults.get(point);
+                    return elementsAtPoint && elementsAtPoint.has(el);
                 });
             })
             .sort((a, b) => {
@@ -400,6 +408,17 @@ async function findBackgroundColor(element, style) {
                 const zIndexB = parseInt(window.getComputedStyle(b[0]).zIndex) || 0;
                 return zIndexB - zIndexA;
             });
+
+        // 샘플링 포인트 간 결과가 크게 다른 경우 불확실로 표시
+        const layerCounts = Array.from(pointResults.values()).map(set => set.size);
+        const avgLayerCount = layerCounts.reduce((a, b) => a + b, 0) / layerCounts.length;
+        const maxDeviation = Math.max(...layerCounts.map(count => Math.abs(count - avgLayerCount)));
+        
+        if (maxDeviation > 2) { // 레이어 수의 차이가 2개 이상 나는 경우
+            isUncertain = true;
+        }
+
+        return commonLayers;
     };
 
     // 요소의 실제 배경색 찾기 (기존 방식)
@@ -436,7 +455,8 @@ async function findBackgroundColor(element, style) {
         if (selfBgInfo.isOpaque) {
             return {
                 backgroundColor: selfBgInfo.color,
-                backgroundElement: element
+                backgroundElement: element,
+                isUncertain: false
             };
         }
         backgroundLayers.push(selfBgInfo);
@@ -458,7 +478,8 @@ async function findBackgroundColor(element, style) {
 
         return {
             backgroundColor: finalColor,
-            backgroundElement: lastElement
+            backgroundElement: lastElement,
+            isUncertain: false
         };
     }
 
@@ -493,14 +514,16 @@ async function findBackgroundColor(element, style) {
         const finalColor = blendMultipleLayers(backgroundLayers);
         return {
             backgroundColor: finalColor,
-            backgroundElement: lastElement || document.body
+            backgroundElement: lastElement || document.body,
+            isUncertain: false
         };
     }
 
     // 폴백: 기본 흰색 배경
     return {
         backgroundColor: 'rgb(255, 255, 255)',
-        backgroundElement: document.body
+        backgroundElement: document.body,
+        isUncertain: true // 배경색을 찾지 못한 경우도 불확실로 표시
     };
 }
 
