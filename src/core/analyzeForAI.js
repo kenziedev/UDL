@@ -263,22 +263,22 @@ export function formatAIResponse(text) {
         // 제목 변환
         .replace(/^### (.*)$/gm, '<h3>$1</h3>')
         .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-        .replace(/^# (\d+\. .*)$/gm, '<section class="ai-section"><h2>$1</h2>') // 큰 질문 단락 시작
+        .replace(/^# (\d+\. .*)$/gm, '<section class="chat-ai-section"><h2>$1</h2>') // 큰 질문 단락 시작
         .replace(/^# (.*)$/gm, '<h1>$1</h1>')
         // 코드 블록 변환
         .replace(/```([\s\S]*?)```/g, (_, code) => {
-            return `<pre><code>${code.trim()}</code></pre>`;
+            return `<pre><code class="chat-inline-code">${code.trim()}</code></pre>`;
         })
         // 인라인 코드, 강조, 링크 등 변환
-        .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+        .replace(/`([^`]+)`/g, '<code class="chat-inline-code">$1</code>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 
     // <code> 태그 내에 <, >가 있으면 &lt;, &gt;로 변환 (디자인 깨짐 방지)
     formatted = formatted.replace(
-      /<code class="inline-code">([\s\S]*?)<\/code>/g,
-      (_, code) => `<code class="inline-code">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`
+      /<code class="chat-inline-code">([\s\S]*?)<\/code>/g,
+      (_, code) => `<code class="chat-inline-code">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`
     );
 
     // 리스트 처리
@@ -293,10 +293,10 @@ export function formatAIResponse(text) {
     formatted = `<p>${formatted}</p>`;
 
     // 각 큰 질문 단락(section) 닫기
-    formatted = formatted.replace(/(<section class="ai-section">[\s\S]*?)(?=<section class="ai-section">|$)/g, '$1</section>');
+    formatted = formatted.replace(/(<section class="chat-ai-section">[\s\S]*?)(?=<section class="chat-ai-section">|$)/g, '$1</section>');
 
     return `
-    <div class="ai-analysis-cards">
+    <div class="chat-ai-analysis-cards">
       ${formatted}
     </div>
   `;

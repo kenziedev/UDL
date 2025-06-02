@@ -1,5 +1,7 @@
 // src/core/chatBot.js
 
+import { copyCodeToClipboard, createCopyButton } from '../utils/copyUtil.js';
+
 let cachedPDFData = null;
 let apiErrorCount = 0;
 window.chatHistory = [];
@@ -37,10 +39,23 @@ export function initChat() {
 }
 
 function observeChatChanges(chatMessages) {
-    const observer = new MutationObserver(() => {
-        setTimeout(() => scrollToBottom(chatMessages), 50);
+    const observer = new MutationObserver((mutations) => {
+        // 코드 복사 버튼 클릭으로 인한 변경은 무시
+        const isCopyButtonClick = mutations.some(mutation => 
+            mutation.target.classList.contains('chat-code-copy') ||
+            mutation.target.closest('.chat-code-copy')
+        );
+        
+        if (!isCopyButtonClick) {
+            setTimeout(() => scrollToBottom(chatMessages), 50);
+        }
     });
-    observer.observe(chatMessages, { childList: true, subtree: true });
+    observer.observe(chatMessages, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'data-copying']
+    });
 }
 
 function scrollToBottom(container) {
@@ -143,7 +158,7 @@ function sendChatMessage() {
 function addUserMessage(message) {
     const chatMessages = document.querySelector('.chat-messages');
     const div = document.createElement('div');
-    div.className = 'chat-message chat-user';
+    div.className = 'chat-message chat-user-message';
     div.textContent = message;
     chatMessages.appendChild(div);
     scrollToBottom(chatMessages);
@@ -152,7 +167,7 @@ function addUserMessage(message) {
 function addBotMessage(message) {
     const chatMessages = document.querySelector('.chat-messages');
     const div = document.createElement('div');
-    div.className = 'chat-message chat-bot';
+    div.className = 'chat-message chat-bot-message';
     div.innerHTML = formatAIResponse(message);
     chatMessages.appendChild(div);
     scrollToBottom(chatMessages);
@@ -193,12 +208,110 @@ function isAccessibilityQuestion(message) {
     return keywords.some(kw => message.toLowerCase().includes(kw.toLowerCase()));
 }
 
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function highlightSyntax(code, language) {
+    // 기본 HTML 하이라이팅
+    if (language === 'html' || !language) {
+        // 먼저 주석 처리
+        code = code.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="code-comment">$1</span>');
+        
+        // 태그 처리 (자체 닫힘 태그 포함)
+        code = code.replace(/(&lt;\/?[a-z][^&]*?(&gt;|\/&gt;))/gi, (match) => {
+            // 태그 이름 추출
+            const tagName = match.match(/&lt;\/?([a-z][a-z0-9-]*)/i)?.[1] || '';
+            // 속성 처리
+            const processedTag = match.replace(/([a-z-]+)=/gi, '<span class="code-attr">$1</span>=')
+                                   .replace(/"([^"]*)"/g, '<span class="code-string">"$1"</span>')
+                                   .replace(/'([^']*)'/g, '<span class="code-string">\'$1\'</span>');
+            return `<span class="code-tag">${processedTag}</span>`;
+        });
+        
+        return code;
+    }
+    // CSS 하이라이팅
+    else if (language === 'css') {
+        return code
+            .replace(/([a-zA-Z-]+)(?=:)/g, '<span class="code-attr">$1</span>')
+            .replace(/(:.*?;)/g, '<span class="code-value">$1</span>')
+            .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="code-comment">$1</span>');
+    }
+    // JavaScript 하이라이팅
+    else if (language === 'javascript' || language === 'js') {
+        return code
+            .replace(/\b(const|let|var|function|return|if|else|for|while|class|import|export)\b/g, '<span class="code-keyword">$1</span>')
+            .replace(/"([^"]*)"/g, '<span class="code-string">"$1"</span>')
+            .replace(/'([^']*)'/g, '<span class="code-string">\'$1\'</span>')
+            .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/)/gm, '<span class="code-comment">$1</span>');
+    }
+    return escapeHtml(code);
+}
+
 export function formatAIResponse(text) {
     if (!text) return '';
 
-    return text
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')   // **볼드**
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')               // *이탤릭*
-        .replace(/`(.+?)`/g, '<code class="inline-code">$1</code>') // `코드`
-        .replace(/\n/g, '<br>');                            // 줄바꿈
+    let formatted = text
+        // 코드 블록 처리
+        .replace(/```(\w*)\n([\s\S]*?)```/g, (_, language, code) => {
+            const trimmedCode = code.trim();
+            const highlightedCode = highlightSyntax(escapeHtml(trimmedCode), language);
+            return `
+                <div class="chat-code-example">
+                    <div class="chat-code-description">코드 예시${language ? ` (${language})` : ''}</div>
+                    <div class="chat-code-content">
+                        <pre><code class="chat-inline-code" data-language="${language || 'html'}">${highlightedCode}</code></pre>
+                        <button class="chat-code-copy" type="button" aria-label="코드 복사">복사</button>
+                    </div>
+                </div>`;
+        })
+        // 인라인 코드 처리 - HTML 태그가 포함된 경우 코드 블록으로 변환
+        .replace(/`([^`]+)`/g, (_, code) => {
+            // HTML 태그가 포함되어 있는지 확인 (더 정확한 정규식 사용)
+            if (/<[a-z][^>]*>/i.test(code)) {
+                const highlightedCode = highlightSyntax(escapeHtml(code), 'html');
+                return `
+                    <div class="chat-code-example">
+                        <div class="chat-code-description">코드 예시 (html)</div>
+                        <div class="chat-code-content">
+                            <pre><code class="chat-inline-code" data-language="html">${highlightedCode}</code></pre>
+                            <button class="chat-code-copy" type="button" aria-label="코드 복사">복사</button>
+                        </div>
+                    </div>`;
+            }
+            // 일반 인라인 코드는 기존대로 처리
+            return `<code class="chat-inline-code">${escapeHtml(code)}</code>`;
+        })
+        // 마크다운 포맷팅
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+
+    // 복사 버튼 이벤트 리스너 추가
+    setTimeout(() => {
+        document.querySelectorAll('.chat-code-copy').forEach(button => {
+            if (!button.hasAttribute('data-initialized')) {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // 버튼의 형제 요소인 pre > code를 찾아서 복사
+                    const codeElement = button.closest('.chat-code-content')?.querySelector('code');
+                    if (codeElement) {
+                        copyCodeToClipboard(button, codeElement);
+                    } else {
+                        console.error('코드 요소를 찾을 수 없습니다:', button);
+                    }
+                });
+                button.setAttribute('data-initialized', 'true');
+            }
+        });
+    }, 0);
+
+    return formatted;
 }

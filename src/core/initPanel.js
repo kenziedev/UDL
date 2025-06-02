@@ -79,8 +79,8 @@ export function initPanel() {
         </div>
         <div class="chat-messages"></div>
         <div class="chat-input">
-          <input type="text" id="chat-input-field" placeholder="웹 접근성에 대해 물어보세요" />
-          <button id="chat-send-btn">전송</button>
+          <input type="text" id="chat-input-field" class="chat-input-field" placeholder="웹 접근성에 대해 물어보세요" />
+          <button id="chat-send-btn" class="chat-send-btn">전송</button>
         </div>
       </div>
       <div class="panel-footer">
