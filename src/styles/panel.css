@@ -251,15 +251,15 @@
 }
 
 .section-card h1 {
-    font-size: 16px; /* 더 작게 */
-    margin-bottom: 10px;
+    font-size: 12px !important;
+    margin-bottom: 8px;
     color: #212529;
     font-weight: 700;
 }
 
 .section-card h2 {
-    font-size: 14px;
-    margin-bottom: 8px;
+    font-size: 10px !important;
+    margin-bottom: 6px;
     color: #343a40;
     font-weight: 600;
 }
@@ -288,6 +288,12 @@
     margin-top: 14px;
     font-size: 13px;
     color: #343a40;
+}
+
+.ai-analysis-cards ul, .ai-analysis-cards li {
+    list-style-type: none !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
 }
 
 ul {
@@ -960,4 +966,24 @@ pre code {
     width: 80%;
     padding-right: 8px;
     color: #495057;
+}
+
+.ai-analysis-cards h1 {
+    font-size: 20px !important;
+    margin-bottom: 8px;
+    color: #212529;
+    font-weight: 700;
+}
+.ai-analysis-cards h2 {
+    font-size: 18px !important;
+    margin-bottom: 6px;
+    color: #343a40;
+    font-weight: 600;
+}
+.ai-analysis-cards h3 {
+    font-size: 15px !important;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    color: #495057;
+    font-weight: 600;
 }
