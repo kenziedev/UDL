@@ -1,4 +1,5 @@
 // src/core/analyzeForAI.js
+import { LoadingManager } from '../utils/loadingUtil.js';
 
 // API 엔드포인트 설정 - Google의 Gemini AI 모델 사용
 const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
@@ -31,8 +32,7 @@ function extractMainContent() {
 // 메인 분석 함수: 웹페이지 분석을 시작하고 UI를 관리
 export function analyzeForAI() {
     // UDL 탭 컨텐츠 영역 선택 및 로딩 표시
-    const udlContent = document.getElementById('tab-content-udl');
-    udlContent.innerHTML = '<div class="loading">AI 분석 중...<br><small>잠시만 기다려주세요.</small></div>';
+    LoadingManager.show('tab-content-udl', 'AI 분석 중...');
 
     // 현재 페이지 데이터 수집
     const pageData = {
@@ -45,6 +45,8 @@ export function analyzeForAI() {
     // API 키 확인
     const userApiKey = sessionStorage.getItem('udl_api_key');
     if (!userApiKey) {
+        LoadingManager.hide('tab-content-udl');
+        const udlContent = document.getElementById('tab-content-udl');
         udlContent.innerHTML = `
             <div class="error">
                 <p>API KEY가 없습니다.</p>
@@ -62,7 +64,8 @@ export function analyzeForAI() {
             if (!response || typeof response !== 'string') {
                 throw new Error('AI 응답이 올바르지 않습니다.');
             }
-            udlContent.innerHTML = '';
+            LoadingManager.hide('tab-content-udl');
+            const udlContent = document.getElementById('tab-content-udl');
             const result = document.createElement('div');
             result.className = 'ai-analysis-result';
             result.innerHTML = cleanAIHtml(formatAIResponse(response));
@@ -70,6 +73,8 @@ export function analyzeForAI() {
         })
         .catch(error => {
             console.error('AI 분석 오류:', error);
+            LoadingManager.hide('tab-content-udl');
+            const udlContent = document.getElementById('tab-content-udl');
             udlContent.innerHTML = `
                 <div class="error">
                     <p>AI 분석 실패: ${error.message}</p>

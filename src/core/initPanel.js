@@ -54,16 +54,16 @@ export function initPanel() {
         <button id="tab-chat">AI 챗봇</button>
       </div>
       <div id="tab-content-contrast" class="tab-content">
-        <div class="loading">검사 중...</div>
+        <div class="loading" data-message="색상 대비 검사 중...">색상 대비 검사 중...</div>
       </div>
       <div id="tab-content-wcag" class="tab-content" style="display:none;">
-        <div class="loading">검사 중...</div>
+        <div class="loading" data-message="검사 중...">검사 중...</div>
       </div>
       <div id="tab-content-udl" class="tab-content" style="display:none;">
-        <div class="loading">분석 중...</div>
+        <div class="loading" data-message="분석 중...">분석 중...</div>
       </div>
       <div id="tab-content-colorblind" class="tab-content" style="display:none;">
-        <div class="loading">색맹 시뮬레이션 도구 로딩 중...</div>
+        <div class="loading" data-message="색맹 시뮬레이션 도구 로딩 중...">색맹 시뮬레이션 도구 로딩 중...</div>
       </div>
       <div id="tab-content-chat" class="tab-content" style="display:none;">
         <div class="chat-header">
