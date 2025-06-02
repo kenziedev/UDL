@@ -77,11 +77,20 @@ export function checkColorBlindness() {
                     <div class="image-preview">
                         <div class="preview-original">
                             <h5>원본 페이지</h5>
-                            <div id="page-original-preview"></div>
+                            <div id="page-original-preview" class="preview-placeholder">
+                                <div class="placeholder-content">
+                                    <p>캡처 버튼을 클릭하여<br>현재 페이지를 캡처하세요</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="preview-simulation">
                             <h5>시뮬레이션 결과</h5>
-                            <canvas id="page-simulation-canvas"></canvas>
+                            <div id="page-simulation-preview" class="preview-placeholder">
+                                <div class="placeholder-content">
+                                    <p>페이지를 캡처하면<br>시뮬레이션 결과가 표시됩니다</p>
+                                </div>
+                            </div>
+                            <canvas id="page-simulation-canvas" style="display: none;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -95,11 +104,24 @@ export function checkColorBlindness() {
                     <div class="image-preview">
                         <div class="preview-original">
                             <h5>원본 이미지</h5>
-                            <img id="original-preview" alt="원본 이미지 미리보기" />
+                            <div id="original-preview" class="preview-placeholder">
+                                <div class="placeholder-content">
+                                    <svg class="upload-icon" viewBox="0 0 24 24" width="48" height="48">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                                    </svg>
+                                    <p>이미지를 업로드하세요</p>
+                                    <small>지원 형식: JPG, PNG, GIF</small>
+                                </div>
+                            </div>
                         </div>
                         <div class="preview-simulation">
                             <h5>시뮬레이션 결과</h5>
-                            <canvas id="simulation-canvas"></canvas>
+                            <div id="simulation-preview" class="preview-placeholder">
+                                <div class="placeholder-content">
+                                    <p>이미지를 업로드하면<br>시뮬레이션 결과가 표시됩니다</p>
+                                </div>
+                            </div>
+                            <canvas id="simulation-canvas" style="display: none;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -131,11 +153,13 @@ export function checkColorBlindness() {
     // 이미지 업로드 관련 요소
     const imageUpload = document.getElementById('image-upload');
     const originalPreview = document.getElementById('original-preview');
+    const simulationPreview = document.getElementById('simulation-preview');
     const simulationCanvas = document.getElementById('simulation-canvas');
     
     // 현재 페이지 캡처 관련 요소
     const capturePageBtn = document.getElementById('capture-page-btn');
     const pageOriginalPreview = document.getElementById('page-original-preview');
+    const pageSimulationPreview = document.getElementById('page-simulation-preview');
     const pageSimulationCanvas = document.getElementById('page-simulation-canvas');
 
     // 색상 샘플 업데이트 함수
@@ -174,18 +198,31 @@ export function checkColorBlindness() {
         updateColorSamples();
 
         // 이미지 업로드 미리보기 업데이트
-        const uploadedImg = originalPreview.src ? new Image() : null;
+        const uploadedImg = originalPreview.querySelector('img');
         if (uploadedImg) {
-            uploadedImg.onload = () => applyColorBlindFilter(uploadedImg, simulationCanvas, type, strength);
-            uploadedImg.src = originalPreview.src;
+            const simulationPreview = document.getElementById('simulation-preview');
+            const simulationCanvas = document.getElementById('simulation-canvas');
+            
+            simulationCanvas.width = uploadedImg.naturalWidth;
+            simulationCanvas.height = uploadedImg.naturalHeight;
+            
+            applyColorBlindFilter(uploadedImg, simulationCanvas, type, strength);
+            simulationPreview.style.display = 'none';
+            simulationCanvas.style.display = 'block';
         }
 
         // 페이지 캡처 미리보기 업데이트
         const pageImg = pageOriginalPreview.querySelector('img');
         if (pageImg) {
-            const img = new Image();
-            img.onload = () => applyColorBlindFilter(img, pageSimulationCanvas, type, strength);
-            img.src = pageImg.src;
+            const pageSimulationPreview = document.getElementById('page-simulation-preview');
+            const pageSimulationCanvas = document.getElementById('page-simulation-canvas');
+            
+            pageSimulationCanvas.width = pageImg.naturalWidth;
+            pageSimulationCanvas.height = pageImg.naturalHeight;
+            
+            applyColorBlindFilter(pageImg, pageSimulationCanvas, type, strength);
+            pageSimulationPreview.style.display = 'none';
+            pageSimulationCanvas.style.display = 'block';
         }
     }
 
@@ -204,14 +241,76 @@ export function checkColorBlindness() {
         const file = e.target.files[0];
         if (!file) return;
 
+        // 미리보기 영역 업데이트
+        const originalPreview = document.getElementById('original-preview');
+        const simulationPreview = document.getElementById('simulation-preview');
+        const simulationCanvas = document.getElementById('simulation-canvas');
+        
+        // 로딩 상태 표시
+        originalPreview.innerHTML = `
+            <div class="preview-placeholder loading">
+                <div class="placeholder-content">
+                    <div class="loading-spinner"></div>
+                    <p>이미지 로딩 중...</p>
+                </div>
+            </div>
+        `;
+        simulationPreview.innerHTML = `
+            <div class="preview-placeholder loading">
+                <div class="placeholder-content">
+                    <div class="loading-spinner"></div>
+                    <p>시뮬레이션 준비 중...</p>
+                </div>
+            </div>
+        `;
+
         const reader = new FileReader();
         reader.onload = function(event) {
             const img = new Image();
             img.onload = function() {
-                originalPreview.src = event.target.result;
+                // 원본 이미지 표시
+                originalPreview.innerHTML = '';
+                originalPreview.appendChild(img);
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                img.style.display = 'block';
+                img.style.margin = '0 auto';
+
+                // 시뮬레이션 캔버스 표시
+                simulationCanvas.style.display = 'block';
+                simulationPreview.style.display = 'none';
+                
+                // 색맹 시뮬레이션 적용
                 applyColorBlindFilter(img, simulationCanvas, typeSelect.value, parseFloat(strengthSlider.value) / 100);
             };
+            img.onerror = function() {
+                originalPreview.innerHTML = `
+                    <div class="preview-placeholder error">
+                        <div class="placeholder-content">
+                            <p>이미지 로드에 실패했습니다</p>
+                            <small>다른 이미지를 시도해주세요</small>
+                        </div>
+                    </div>
+                `;
+                simulationPreview.innerHTML = `
+                    <div class="preview-placeholder error">
+                        <div class="placeholder-content">
+                            <p>시뮬레이션을 실행할 수 없습니다</p>
+                        </div>
+                    </div>
+                `;
+            };
             img.src = event.target.result;
+        };
+        reader.onerror = function() {
+            originalPreview.innerHTML = `
+                <div class="preview-placeholder error">
+                    <div class="placeholder-content">
+                        <p>파일을 읽을 수 없습니다</p>
+                        <small>다른 이미지를 시도해주세요</small>
+                    </div>
+                </div>
+            `;
         };
         reader.readAsDataURL(file);
     });
@@ -399,11 +498,11 @@ export function checkColorBlindness() {
                     // 원본 미리보기에 이미지 추가
                     pageOriginalPreview.innerHTML = '';
                     const previewImg = document.createElement('img');
-                    previewImg.style.width = '100%'; // 컨테이너 너비에 맞춤
+                    previewImg.style.width = '100%';
                     previewImg.style.height = 'auto';
                     previewImg.style.display = 'block';
                     previewImg.style.margin = '0 auto';
-                    previewImg.style.objectFit = 'contain'; // 비율 유지하면서 컨테이너에 맞춤
+                    previewImg.style.objectFit = 'contain';
                     
                     // 이미지 로드 Promise 생성
                     const imageLoadPromise = new Promise((resolve, reject) => {
@@ -428,6 +527,10 @@ export function checkColorBlindness() {
                         // 이미지 로드 완료 대기
                         const loadedImage = await imageLoadPromise;
                         
+                        // 시뮬레이션 캔버스 표시 설정
+                        const pageSimulationPreview = document.getElementById('page-simulation-preview');
+                        const pageSimulationCanvas = document.getElementById('page-simulation-canvas');
+                        
                         // 시뮬레이션 캔버스 크기 설정
                         pageSimulationCanvas.width = loadedImage.naturalWidth;
                         pageSimulationCanvas.height = loadedImage.naturalHeight;
@@ -439,6 +542,10 @@ export function checkColorBlindness() {
                         
                         // 색맹 시뮬레이션 적용
                         applyColorBlindFilter(loadedImage, pageSimulationCanvas, typeSelect.value, parseFloat(strengthSlider.value) / 100);
+                        
+                        // 시뮬레이션 결과 표시
+                        pageSimulationPreview.style.display = 'none';
+                        pageSimulationCanvas.style.display = 'block';
                         
                         // URL 해제
                         URL.revokeObjectURL(imageUrl);
