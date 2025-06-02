@@ -205,29 +205,41 @@
     outline-offset: 2px;
 }
 
+/* 개선된 로딩 스타일 (AI 분석 등) */
 .loading {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 24px 32px;
     color: #6c757d;
+    z-index: 1000;
+    gap: 12px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    min-width: 220px;
+    min-height: 80px;
 }
-
-.loading::after {
+.loading::before {
     content: '';
-    width: 20px;
-    height: 20px;
-    margin-left: 10px;
-    border: 2px solid #ced4da;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #ced4da;
     border-radius: 50%;
     border-top-color: #3a7bd5;
     animation: spin 0.6s linear infinite;
+    display: block;
+    margin: 0 auto 10px auto;
 }
-
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
-
 
 /* AI 제안 */
 /* AI 제안 */
