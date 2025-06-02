@@ -44,15 +44,13 @@ export function displayContrastResults(results) {
         backgroundElementHTML: r.backgroundElementHTML,
         contrast: r.contrast,
         aa: r.aa,
-        aaa: r.aaa,
-        isUncertain: r.isUncertain
+        aaa: r.aaa
     })));
 
-    const fails = results.filter(r => !r.aa && !r.isUncertain);
-    const passes = results.filter(r => r.aa && !r.isUncertain);
-    const uncertains = results.filter(r => r.isUncertain);
+    const fails = results.filter(r => !r.aa);
+    const passes = results.filter(r => r.aa);
     const total = results.length;
-    const pct = total ? Math.round((passes.length + uncertains.length) / total * 100) : 0;
+    const pct = total ? Math.round(passes.length / total * 100) : 0;
 
     // 색상 대비 평가 기준 설명 추가
     const contrastGuide = document.createElement('div');
@@ -131,9 +129,6 @@ export function displayContrastResults(results) {
               <button id="tab-pass" class="contrast-tab-btn" data-tab="pass">
                 <span class="tab-icon pass-icon">✓</span> 적합 항목 (${passes.length})
               </button>
-              <button id="tab-uncertain" class="contrast-tab-btn" data-tab="uncertain">
-                <span class="tab-icon uncertain-icon">❓</span> 판단불가 (${uncertains.length})
-              </button>
               <button id="tab-manual" class="contrast-tab-btn" data-tab="manual">
                 <span class="tab-icon manual-icon">⚙</span> 수동 검사
               </button>
@@ -143,7 +138,6 @@ export function displayContrastResults(results) {
         <div id="contrast-tab-content" class="contrast-tab-content">
           <div id="contrast-tab-fail" class="contrast-tab-pane active"></div>
           <div id="contrast-tab-pass" class="contrast-tab-pane"></div>
-          <div id="contrast-tab-uncertain" class="contrast-tab-pane"></div>
           <div id="contrast-tab-manual" class="contrast-tab-pane"></div>
         </div>
       `;
@@ -444,79 +438,6 @@ export function displayContrastResults(results) {
         passPane.appendChild(passItems);
     } else {
         passPane.innerHTML = '<div class="empty-message">적합 항목이 없습니다.</div>';
-    }
-
-    // 판단불가 항목 내용 생성
-    const uncertainPane = document.getElementById('contrast-tab-uncertain');
-    if (uncertains.length) {
-        const uncertainItems = document.createElement('div');
-        uncertainItems.className = 'contrast-items';
-
-        uncertains.forEach(r => {
-            const item = document.createElement('div');
-            item.className = 'contrast-item contrast-uncertain';
-
-            item.innerHTML = `
-            <div class="item-header">
-              <span class="label label-uncertain">판단불가</span>
-              <span class="item-text">"${r.text}"</span>
-            </div>
-            <div class="item-details">
-              <div class="contrast-info-row">
-                <div class="color-sample-box" style="color: ${r.textColorHex}; background-color: ${r.backgroundColorHex}">Abc</div>
-                <div class="contrast-ratio">
-                  <div class="ratio-value uncertain-ratio">배경색 판단 불가 - 대비율:${r.contrast.toFixed(2)}:1</div>
-                  <div class="color-info">
-                    <span class="color-chip">
-                      <span class="color-preview" style="background-color:${r.textColorHex}"></span>
-                      <span class="color-code">${r.textColorHex}</span>
-                    </span>
-                    <span class="color-chip">
-                      <span class="color-preview" style="background-color:${r.backgroundColorHex}"></span>
-                      <span class="color-code">${r.backgroundColorHex}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="element-code-preview">
-                <button class="code-toggle">코드 보기</button>
-                <div class="code-content">
-                  <code class="element-html">텍스트 요소: ${escapeHTML(r.elementHTML)}</code>
-                  ${r.backgroundElementHTML ? `<code class="bg-element-html">배경 요소: ${escapeHTML(r.backgroundElementHTML)}</code>` : ''}
-                </div>
-              </div>
-            </div>
-          `;
-
-            item.onclick = (e) => {
-                // 코드 토글 버튼 클릭 시 이벤트 처리
-                if (e.target.classList.contains('code-toggle') || e.target.closest('.code-toggle')) {
-                    const toggleBtn = e.target.classList.contains('code-toggle') ? e.target : e.target.closest('.code-toggle');
-                    const codeContent = toggleBtn.nextElementSibling;
-                    codeContent.classList.toggle('show');
-                    toggleBtn.classList.toggle('active');
-                    toggleBtn.textContent = codeContent.classList.contains('show') ? '코드 접기' : '코드 보기';
-                    e.stopPropagation();
-                    return;
-                }
-
-                // 코드 영역 클릭 시 이벤트 전파 중지
-                if (e.target.closest('.code-content')) {
-                    e.stopPropagation();
-                    return;
-                }
-
-                removeHighlights();
-                r.element.classList.add('item-highlight');
-                r.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            };
-
-            uncertainItems.appendChild(item);
-        });
-
-        uncertainPane.appendChild(uncertainItems);
-    } else {
-        uncertainPane.innerHTML = '<div class="empty-message">판단불가 항목이 없습니다.</div>';
     }
 
     // HTML 문자열 이스케이프 함수
@@ -1072,22 +993,13 @@ export function displayContrastResults(results) {
           outline: 3px solid #4285f4 !important;
           outline-offset: 2px !important;
         }
-        
-        .uncertain-icon {
-            color: #9e9e9e;
-        }
 
-        .label-uncertain {
-            background-color: #f5f5f5;
-            color: #757575;
-        }
-
-        .contrast-uncertain {
-            border-color: #e0e0e0;
-        }
-
+        /* 판단불가 관련 스타일 제거 */
+        .uncertain-icon,
+        .label-uncertain,
+        .contrast-uncertain,
         .uncertain-ratio {
-            color: #757575;
+            display: none;
         }
     `;
     c.appendChild(styleEl);
