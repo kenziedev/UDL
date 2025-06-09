@@ -48,19 +48,11 @@ export function initPanel() {
       </div>
       <div class="panel-tabs">
         <button id="tab-contrast" class="tab-active">명도 대비</button>
-        <button id="tab-wcag">웹 접근성 항목</button>
-        <button id="tab-udl">AI 제안</button>
         <button id="tab-colorblind">색맹 시뮬레이션</button>
         <button id="tab-chat">AI 챗봇</button>
       </div>
       <div id="tab-content-contrast" class="tab-content">
         <div class="loading" data-message="색상 대비 검사 중...">색상 대비 검사 중...</div>
-      </div>
-      <div id="tab-content-wcag" class="tab-content" style="display:none;">
-        <div class="loading" data-message="검사 중...">검사 중...</div>
-      </div>
-      <div id="tab-content-udl" class="tab-content" style="display:none;">
-        <div class="loading" data-message="분석 중...">분석 중...</div>
       </div>
       <div id="tab-content-colorblind" class="tab-content" style="display:none;">
         <div class="loading" data-message="색맹 시뮬레이션 도구 로딩 중...">색맹 시뮬레이션 도구 로딩 중...</div>
@@ -112,15 +104,13 @@ export function initPanel() {
     makePanelDraggable(panel);
 
     // 탭 전환 이벤트
-    const tabs = ['contrast', 'wcag', 'udl', 'colorblind', 'chat'];
+    const tabs = ['contrast', 'colorblind', 'chat'];
     tabs.forEach(tab => {
         document.getElementById(`tab-${tab}`).onclick = () => activateTab(tab);
     });
 
     document.getElementById('run-full-scan').onclick = () => {
         checkColorContrast();
-        analyzeWCAG();
-        analyzeForAI();
         checkColorBlindness();
     };
 
@@ -139,8 +129,6 @@ export function initPanel() {
 
         switch(tabId) {
             case 'contrast': checkColorContrast(); break;
-            case 'wcag': analyzeWCAG(); break;
-            case 'udl': analyzeForAI(); break;
             case 'colorblind': checkColorBlindness(); break;
             case 'chat': initChat(); break;
         }

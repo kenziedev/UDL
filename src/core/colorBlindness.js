@@ -48,21 +48,6 @@ export function checkColorBlindness() {
                 </div>
             </div>
 
-            <div class="colorblind-preview">
-                <div class="preview-container">
-                    <h4>원본 색상 샘플</h4>
-                    <div class="color-samples original-samples">
-                        <div class="color-sample" style="background-color: #E53935;">#E53935 (빨강)</div>
-                        <div class="color-sample" style="background-color: #43A047;">#43A047 (녹색)</div>
-                        <div class="color-sample" style="background-color: #1E88E5;">#1E88E5 (파랑)</div>
-                        <div class="color-sample" style="background-color: #FDD835;">#FDD835 (노랑)</div>
-                        <div class="color-sample" style="background-color: #8E24AA;">#8E24AA (보라)</div>
-                        <div class="color-sample" style="background-color: #00ACC1;">#00ACC1 (청록)</div>
-                        <div class="color-sample" style="background-color: #FF9800;">#FF9800 (주황)</div>
-                        <div class="color-sample" style="background-color: #6D4C41;">#6D4C41 (갈색)</div>
-                    </div>
-                </div>
-
                 <div class="preview-container">
                     <h4>시뮬레이션 결과</h4>
                     <div class="color-samples" id="colorblind-samples"></div>
@@ -126,6 +111,21 @@ export function checkColorBlindness() {
                     </div>
                 </div>
             </div>
+
+            <div class="colorblind-preview">
+                <div class="preview-container">
+                    <h4>원본 색상 샘플</h4>
+                    <div class="color-samples original-samples">
+                        <div class="color-sample" style="background-color: #E53935;">#E53935 (빨강)</div>
+                        <div class="color-sample" style="background-color: #43A047;">#43A047 (녹색)</div>
+                        <div class="color-sample" style="background-color: #1E88E5;">#1E88E5 (파랑)</div>
+                        <div class="color-sample" style="background-color: #FDD835;">#FDD835 (노랑)</div>
+                        <div class="color-sample" style="background-color: #8E24AA;">#8E24AA (보라)</div>
+                        <div class="color-sample" style="background-color: #00ACC1;">#00ACC1 (청록)</div>
+                        <div class="color-sample" style="background-color: #FF9800;">#FF9800 (주황)</div>
+                        <div class="color-sample" style="background-color: #6D4C41;">#6D4C41 (갈색)</div>
+                    </div>
+                </div>
 
             <div class="colorblind-info">
                 <h4>색맹에 대한 이해</h4>
