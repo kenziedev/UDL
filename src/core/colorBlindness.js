@@ -47,12 +47,6 @@ export function checkColorBlindness() {
                     <span id="strength-value">100%</span>
                 </div>
             </div>
-
-                <div class="preview-container">
-                    <h4>시뮬레이션 결과</h4>
-                    <div class="color-samples" id="colorblind-samples"></div>
-                </div>
-            </div>
             
             <div class="colorblind-current-page">
                 <h4>현재 페이지 색맹 시뮬레이션</h4>
@@ -126,6 +120,12 @@ export function checkColorBlindness() {
                         <div class="color-sample" style="background-color: #6D4C41;">#6D4C41 (갈색)</div>
                     </div>
                 </div>
+
+                <div class="preview-container">
+                    <h4>시뮬레이션 결과</h4>
+                    <div class="color-samples" id="colorblind-samples"></div>
+                </div>
+            </div>
 
             <div class="colorblind-info">
                 <h4>색맹에 대한 이해</h4>
