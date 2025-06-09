@@ -94,14 +94,6 @@ export function initPanel() {
             </svg>
             대화 내용 다운로드
           </button>
-          <button id="download-results" class="button secondary-btn contrast-only-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            보고서 다운로드
-          </button>
         </div>
         <div class="right-buttons">
           <button class="button primary-btn" id="run-full-scan">
@@ -113,6 +105,7 @@ export function initPanel() {
             검사 새로고침
           </button>
         </div>
+        <div class="copyright-text">© 스마트러닝연구소 All Rights Reserved.</div>
       </div>
     `;
     document.body.appendChild(panel);
@@ -124,7 +117,6 @@ export function initPanel() {
         document.getElementById(`tab-${tab}`).onclick = () => activateTab(tab);
     });
 
-    document.getElementById('download-results').onclick = () => downloadReport();
     document.getElementById('run-full-scan').onclick = () => {
         checkColorContrast();
         analyzeWCAG();
